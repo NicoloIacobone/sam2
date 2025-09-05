@@ -99,7 +99,7 @@ def main():
         # scan all the frame names in this directory
         frame_names = [
             p for p in os.listdir(input_dir)
-            if os.path.splitext(p)[-1] in [".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG"]
+            if os.path.splitext(p)[-1] in [".jpg", ".jpeg", ".JPG", ".JPEG"]
         ]
         # frame_names.sort(key=lambda p: int(os.path.splitext(p)[0]))
         frame_names.sort(key=lambda p: int(re.search(r'\d+$', os.path.splitext(p)[0]).group()))
@@ -113,9 +113,9 @@ def main():
         ann_obj_id = 1 # give a unique id to each object we interact with (it can be any integers)
 
         # Let's add a positive click at (x, y) = (210, 350) to get started
-        points = np.array([[210, 350]], dtype=np.float32)
+        points = np.array([[129, 202], [323, 139], [265, 365], [187, 399]], dtype=np.float32)
         # for labels, `1` means positive click and `0` means negative click
-        labels = np.array([1], np.int32)
+        labels = np.array([1, 1, 1, 1], np.int32)
         _, out_obj_ids, out_mask_logits = sam2.add_new_points_or_box(
             inference_state=inference_state,
             frame_idx=ann_frame_idx,
@@ -133,7 +133,7 @@ def main():
             }
 
         # save the segmentation results every few frames
-        vis_frame_stride = 30
+        vis_frame_stride = 1 # loop over all frames
         # Loop through frames at intervals defined by vis_frame_stride
         for out_frame_idx in range(0, len(frame_names), vis_frame_stride):
             # Load the current frame as a PIL image and convert to numpy array
