@@ -44,9 +44,9 @@ exclude_list=("video1" "video2" "video3")  # Add video names (without extension)
 
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 inference..."
-dir_name='helloworld'
+dir_name='bouncing_balls'
 echo "Processing video: $dir_name"
-python inference.py --input_dir="$dir_name"
+python inference.py --input_dir="$dir_name" --video=True
 echo "----------------------------------"
 
 echo "=== Job finished at $(date) ==="
