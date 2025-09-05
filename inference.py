@@ -41,12 +41,12 @@ def process_image(image_path, mask_generator, output_dir):
 
 def main():
     parser = argparse.ArgumentParser(description="SAM2 Mask Generator Example")
-    parser.add_argument('--input_dir', type=str, default='bouncing_balls', help='Cartella immagini di input (default: input_images)')
+    parser.add_argument('--input_dir', type=str, default='bouncing_balls', help='Nome cartella immagini di input (default: input_images)')
     # parser.add_argument('--output_dir', type=str, default='/cluster/work/igp_psr/niacobone/examples/kubric', help='Cartella di output per i risultati')
     args = parser.parse_args()
 
     input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
-    output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/SpaTrackV2/' + args.input_dir
+    output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir
 
     # Selezione device
     if torch.cuda.is_available():
@@ -74,12 +74,12 @@ def main():
     sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
     mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     # Filtra solo immagini comuni
     valid_exts = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff'}
     for fname in os.listdir(input_dir):
         if os.path.splitext(fname)[1].lower() in valid_exts:
-            process_image(os.path.join(input_dir, fname), mask_generator, args.output_dir)
+            process_image(os.path.join(input_dir, fname), mask_generator, output_dir)
 
 if __name__ == "__main__":
     main()
