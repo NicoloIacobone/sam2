@@ -54,6 +54,18 @@ def show_mask(mask, ax, obj_id=None, random_color=False):
     mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
     ax.imshow(mask_image)
 
+def show_points(coords, labels, ax, marker_size=200):
+    pos_points = coords[labels==1]
+    neg_points = coords[labels==0]
+    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+
+
+def show_box(box, ax):
+    x0, y0 = box[0], box[1]
+    w, h = box[2] - box[0], box[3] - box[1]
+    ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0, 0, 0, 0), lw=2))
+
 def main():
     parser = argparse.ArgumentParser(description="SAM2 Mask Generator Example")
     parser.add_argument('--input_dir', type=str, default='bouncing_balls', help='Nome cartella immagini di input (default: input_images)')
@@ -109,20 +121,44 @@ def main():
         print(f"Initialized inference state with {len(frame_names)} frames.")
 
         # SOSTITUISCI QUI SOTTO DOPO AVER SCRITTO LO SCRIPT CHE INIZIALIZZA LE MASCHERE
-        ann_frame_idx = 0 # the frame index we interact with
-        ann_obj_id = 1 # give a unique id to each object we interact with (it can be any integers)
+        prompts = {}  # dictionary to store prompts for each object
+        ann_frame_idx = [0, 0, 0, 0] # the frame index we interact with
+        ann_obj_id = [1, 2, 3, 4] # give a unique id to each object we interact with (it can be any integers)
 
         # Let's add a positive click at (x, y) = (210, 350) to get started
         points = np.array([[129, 202], [323, 139], [265, 365], [187, 399]], dtype=np.float32)
         # for labels, `1` means positive click and `0` means negative click
         labels = np.array([1, 1, 1, 1], np.int32)
-        _, out_obj_ids, out_mask_logits = sam2.add_new_points_or_box(
+
+        for i in range(len(ann_frame_idx)):
+            obj_id = ann_obj_id[i]
+            frame_idx = ann_frame_idx[i]
+            point = points[i:i+1]
+            label = labels[i:i+1]
+            prompts[obj_id] = (point, label)
+            _, out_obj_ids, out_mask_logits = sam2.add_new_points_or_box(
             inference_state=inference_state,
-            frame_idx=ann_frame_idx,
-            obj_id=ann_obj_id,
-            points=points,
-            labels=labels,
+            frame_idx=frame_idx,
+            obj_id=obj_id,
+            points=point,
+            labels=label,
         )
+            
+        # save the results on the current (interacted) frame as an image
+        save_frame_idx = ann_frame_idx[0] if isinstance(ann_frame_idx, (list, np.ndarray)) else ann_frame_idx
+        fig, ax = plt.subplots(figsize=(9, 6))
+        ax.set_title(f"frame {save_frame_idx}")
+        img = Image.open(os.path.join(input_dir, frame_names[save_frame_idx]))
+        ax.imshow(img)
+        show_points(points, labels, ax)
+        for i, out_obj_id in enumerate(out_obj_ids):
+            show_points(*prompts[out_obj_id], ax)
+            show_mask((out_mask_logits[i] > 0.0).cpu().numpy(), ax, obj_id=out_obj_id)
+        ax.axis('off')
+        save_path = os.path.join(output_dir, f"frame_{save_frame_idx:04d}_interacted.png")
+        plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+        plt.close(fig)
+        print(f"Saved interacted frame visualization to: {save_path}")
 
         # propagate the prompts to get the masklet across the video
         video_segments = {}  # video_segments contains the per-frame segmentation results
@@ -152,7 +188,7 @@ def main():
             save_path = os.path.join(output_dir, f"frame_{out_frame_idx:04d}_masks.png")
             plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
             plt.close(fig)
-        print(f"Saved mask visualization to: {save_path}")
+        print(f"Saved mask visualization to: {output_dir}")
     else:
         print("Image mode enabled.")
         sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
