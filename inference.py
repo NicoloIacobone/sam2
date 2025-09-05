@@ -1,3 +1,4 @@
+print("importing libraries...")
 import os
 import argparse
 import numpy as np
@@ -6,6 +7,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from sam2.build_sam import build_sam2
 from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
+print("libraries imported.")
 
 def show_anns_on_ax(ax, anns, borders=True):
     if len(anns) == 0:
@@ -38,6 +40,7 @@ def process_image(image_path, mask_generator, output_dir):
     out_path = os.path.join(output_dir, os.path.splitext(os.path.basename(image_path))[0] + "_masks.png")
     plt.savefig(out_path, bbox_inches='tight', pad_inches=0)
     plt.close(fig)
+    print(f"Result saved to: {out_path}")
 
 def main():
     parser = argparse.ArgumentParser(description="SAM2 Mask Generator Example")
@@ -47,6 +50,8 @@ def main():
 
     input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
     output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir
+    print(f"Input directory: {input_dir}")
+    print(f"Output directory: {output_dir}")
 
     # Selezione device
     if torch.cuda.is_available():
@@ -55,7 +60,7 @@ def main():
         device = torch.device("mps")
     else:
         device = torch.device("cpu")
-    print(f"using device: {device}")
+    print(f"Using device: {device}")
 
     if device.type == "cuda":
         torch.autocast("cuda", dtype=torch.bfloat16).__enter__()
@@ -69,17 +74,24 @@ def main():
             "See e.g. https://github.com/pytorch/pytorch/issues/84936 for a discussion."
         )
 
+    print("Loading SAM2 model and mask generator...")
     sam2_checkpoint = "checkpoints/sam2.1_hiera_large.pt"
     model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
     sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
     mask_generator = SAM2AutomaticMaskGenerator(sam2)
+    print("Model and mask generator loaded.")
 
     os.makedirs(output_dir, exist_ok=True)
+
     # Filtra solo immagini comuni
     valid_exts = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff'}
-    for fname in os.listdir(input_dir):
-        if os.path.splitext(fname)[1].lower() in valid_exts:
-            process_image(os.path.join(input_dir, fname), mask_generator, output_dir)
+    image_files = [fname for fname in os.listdir(input_dir) if os.path.splitext(fname)[1].lower() in valid_exts]
+    print(f"Found {len(image_files)} valid image(s) in input directory.")
+
+    for idx, fname in enumerate(image_files):
+        print(f"Processing image {idx+1}/{len(image_files)}: {fname}")
+        process_image(os.path.join(input_dir, fname), mask_generator, output_dir)
+    print("Processing complete.")
 
 if __name__ == "__main__":
     main()
