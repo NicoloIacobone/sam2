@@ -69,7 +69,7 @@ def main():
             "See e.g. https://github.com/pytorch/pytorch/issues/84936 for a discussion."
         )
 
-    sam2_checkpoint = "../checkpoints/sam2.1_hiera_large.pt"
+    sam2_checkpoint = "checkpoints/sam2.1_hiera_large.pt"
     model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
     sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
     mask_generator = SAM2AutomaticMaskGenerator(sam2)
