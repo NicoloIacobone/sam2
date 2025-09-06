@@ -170,8 +170,8 @@ def main():
             inference_state=inference_state,
             frame_idx=frame_idx,
             obj_id=obj_id,
-            labels=label,
             box=point_box
+            # labels=label,
             # points=point,
         )
             
