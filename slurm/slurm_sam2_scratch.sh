@@ -40,14 +40,18 @@ echo "Activated Python venv: $(which python)"
 
 # Execute
 
-exclude_list=("video1" "video2" "video3")  # Add video names (without extension) to exclude
+# exclude_list=("video1" "video2" "video3")  # Add video names (without extension) to exclude
 
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 inference..."
-dir_name='bouncing_balls'
-echo "Processing video: $dir_name"
-python inference.py --input_dir="$dir_name" --video=True
-echo "----------------------------------"
+
+include_list=("test_0" "test_1" "test_2")  # directory da includere
+
+for dir_name in "${include_list[@]}"; do
+    echo "Processing video: $dir_name"
+    python inference.py --input_dir="$dir_name" --video=True
+    echo "----------------------------------"
+done
 
 echo "=== Job finished at $(date) ==="
 start_time=${SLURM_JOB_START_TIME:-$(date +%s)}

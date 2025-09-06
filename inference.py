@@ -8,6 +8,7 @@ from PIL import Image
 from sam2.build_sam import build_sam2, build_sam2_video_predictor
 from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
 import re
+import json
 print("libraries imported.")
 
 def show_anns_on_ax(ax, anns, borders=True):
@@ -122,13 +123,34 @@ def main():
 
         # SOSTITUISCI QUI SOTTO DOPO AVER SCRITTO LO SCRIPT CHE INIZIALIZZA LE MASCHERE
         prompts = {}  # dictionary to store prompts for each object
-        ann_frame_idx = [0, 0, 0, 0] # the frame index we interact with
-        ann_obj_id = [1, 2, 3, 4] # give a unique id to each object we interact with (it can be any integers)
+        # Path to metadata.json
+        metadata_path = os.path.join(input_dir, "metadata.json")
+        with open(metadata_path, "r") as f:
+            metadata = json.load(f)
 
-        # Let's add a positive click at (x, y) = (210, 350) to get started
-        points = np.array([[129, 202], [323, 139], [265, 365], [187, 399]], dtype=np.float32)
-        # for labels, `1` means positive click and `0` means negative click
-        labels = np.array([1, 1, 1, 1], np.int32)
+        instances = metadata["instances"]
+        # Read frame size
+        width = metadata["metadata"]["resolution"][0]
+        height = metadata["metadata"]["resolution"][1]
+
+        ann_frame_idx = []
+        ann_obj_id = []
+        points = []
+        labels = []
+
+        for idx, instance in enumerate(instances):
+            ann_frame_idx.append(0)
+            ann_obj_id.append(idx + 1)
+            labels.append(1)
+            miny, minx, maxy, maxx = instance["bboxes"][0]
+            center_x = (minx + maxx) / 2
+            center_y = (miny + maxy) / 2
+            center_x_pixel = center_x * width
+            center_y_pixel = center_y * height
+            points.append([center_x_pixel, center_y_pixel])
+
+        points = np.array(points, dtype=np.float32)
+        labels = np.array(labels, dtype=np.int32)
 
         for i in range(len(ann_frame_idx)):
             obj_id = ann_obj_id[i]
