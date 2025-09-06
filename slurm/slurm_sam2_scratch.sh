@@ -45,7 +45,7 @@ echo "Activated Python venv: $(which python)"
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 inference..."
 
-include_list=("test_0" "test_1" "test_2")  # directory da includere
+include_list=("video_01_static_short" "video_02_static_medium" "video_03_static_long")  # directory da includere
 echo "----------------------------------"
 
 for dir_name in "${include_list[@]}"; do
