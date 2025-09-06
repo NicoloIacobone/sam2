@@ -134,7 +134,7 @@ def main():
 
         ann_frame_idx = []
         ann_obj_id = []
-        points = []
+        points_box = []
         labels = []
 
         for idx, instance in enumerate(instances):
@@ -146,27 +146,33 @@ def main():
             ann_obj_id.append(idx + 1)
             labels.append(1)
             miny, minx, maxy, maxx = instance["bboxes"][0]
-            center_x = (minx + maxx) / 2
-            center_y = (miny + maxy) / 2
-            center_x_pixel = center_x * width
-            center_y_pixel = center_y * height
-            points.append([center_x_pixel, center_y_pixel])
+            # center_x = (minx + maxx) / 2
+            # center_y = (miny + maxy) / 2
+            # center_x_pixel = center_x * width
+            # center_y_pixel = center_y * height
+            # points_box.append([center_x_pixel, center_y_pixel])
+            x_min_pixel = minx * width
+            y_min_pixel = miny * height
+            x_max_pixel = maxx * width
+            y_max_pixel = maxy * height
+            points_box.append([x_min_pixel, y_min_pixel, x_max_pixel, y_max_pixel])
 
-        points = np.array(points, dtype=np.float32)
+        points_box = np.array(points_box, dtype=np.float32)
         labels = np.array(labels, dtype=np.int32)
 
         for i in range(len(ann_frame_idx)):
             obj_id = ann_obj_id[i]
             frame_idx = ann_frame_idx[i]
-            point = points[i:i+1]
+            point_box = points_box[i:i+1]
             label = labels[i:i+1]
-            prompts[obj_id] = (point, label)
+            prompts[obj_id] = (point_box, label)
             _, out_obj_ids, out_mask_logits = sam2.add_new_points_or_box(
             inference_state=inference_state,
             frame_idx=frame_idx,
             obj_id=obj_id,
-            points=point,
             labels=label,
+            box=point_box
+            # points=point,
         )
             
         # save the results on the current (interacted) frame as an image
@@ -175,9 +181,12 @@ def main():
         ax.set_title(f"frame {save_frame_idx}")
         img = Image.open(os.path.join(input_dir, frame_names[save_frame_idx]))
         ax.imshow(img)
-        show_points(points, labels, ax)
+        # show_points(points, labels, ax)  # Commentato: ora si usano i bounding box
         for i, out_obj_id in enumerate(out_obj_ids):
-            show_points(*prompts[out_obj_id], ax)
+            # show_points(*prompts[out_obj_id], ax)  # Commentato: ora si usano i bounding box
+            # Visualizza il bounding box invece dei punti
+            box = prompts[out_obj_id][0][0]  # shape: (4,) -> [x_min, y_min, x_max, y_max]
+            show_box(box, ax)
             show_mask((out_mask_logits[i] > 0.0).cpu().numpy(), ax, obj_id=out_obj_id)
         ax.axis('off')
         save_path = os.path.join(output_dir, f"frame_{save_frame_idx:04d}_interacted.png")
