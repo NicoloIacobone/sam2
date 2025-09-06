@@ -140,6 +140,7 @@ def main():
         for idx, instance in enumerate(instances):
             # Skip if the first element of "visibility" is 0
             if "visibility" in instance and instance["visibility"][0] == 0:
+                print(f"Skipping instance {idx} due to visibility 0 in first frame.")
                 continue
             ann_frame_idx.append(0)
             ann_obj_id.append(idx + 1)
