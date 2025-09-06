@@ -121,7 +121,6 @@ def main():
         inference_state = sam2.init_state(video_path=input_dir)
         print(f"Initialized inference state with {len(frame_names)} frames.")
 
-        # SOSTITUISCI QUI SOTTO DOPO AVER SCRITTO LO SCRIPT CHE INIZIALIZZA LE MASCHERE
         prompts = {}  # dictionary to store prompts for each object
         # Path to metadata.json
         metadata_path = os.path.join(input_dir, "metadata.json")
@@ -139,6 +138,9 @@ def main():
         labels = []
 
         for idx, instance in enumerate(instances):
+            # Skip if the first element of "visibility" is 0
+            if "visibility" in instance and instance["visibility"][0] == 0:
+                continue
             ann_frame_idx.append(0)
             ann_obj_id.append(idx + 1)
             labels.append(1)
