@@ -71,7 +71,7 @@ def main():
     parser = argparse.ArgumentParser(description="SAM2 Mask Generator Example")
     parser.add_argument('--input_dir', type=str, default='bouncing_balls', help='Nome cartella immagini di input (default: input_images)')
     # parser.add_argument('--output_dir', type=str, default='/cluster/work/igp_psr/niacobone/examples/kubric', help='Cartella di output per i risultati')
-    parser.add_argument('--video', type=bool, default=False, help='If True, process video instead of images (default: False)')
+    parser.add_argument('--video', type=bool, default=True, help='If True, process video instead of images (default: True). Video means a directory with frames in .jpg and metadata.json')
     args = parser.parse_args()
 
     input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
@@ -113,6 +113,7 @@ def main():
         frame_names = [
             p for p in os.listdir(input_dir)
             if os.path.splitext(p)[-1] in [".jpg", ".jpeg", ".JPG", ".JPEG"]
+            and not p.startswith("segmentation_")
         ]
         # frame_names.sort(key=lambda p: int(os.path.splitext(p)[0]))
         frame_names.sort(key=lambda p: int(re.search(r'\d+$', os.path.splitext(p)[0]).group()))

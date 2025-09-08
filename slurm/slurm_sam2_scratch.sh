@@ -50,7 +50,7 @@ echo "----------------------------------"
 
 for dir_name in "${include_list[@]}"; do
     echo "Processing video: $dir_name"
-    python inference.py --input_dir="$dir_name" --video=True
+    python inference.py --input_dir="$dir_name"
     echo "----------------------------------"
 done
 
