@@ -75,8 +75,13 @@ def main():
     args = parser.parse_args()
 
     input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
-    output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir
+    output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir # here it goes the first frame with the interaction (bounding box)
+    masks_dir = os.path.join(output_dir, 'masks') # here it goes all the masks applied to frames
+    object_masks_dir = os.path.join(output_dir, 'object_masks') # here it goes all the masks of each object
+
     os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(masks_dir, exist_ok=True)
+    os.makedirs(object_masks_dir, exist_ok=True)
     print(f"Input directory: {input_dir}")
     print(f"Output directory: {output_dir}")
 
@@ -105,7 +110,7 @@ def main():
     sam2_checkpoint = "checkpoints/sam2.1_hiera_large.pt"
     model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
-    if args.video:
+    if args.video: # if in input there is a video (frames in .jpg + metadata.json)
         print("Video mode enabled.")
         sam2 = build_sam2_video_predictor(model_cfg, sam2_checkpoint, device=device)
 
@@ -222,15 +227,15 @@ def main():
                 mask_img = (out_mask * 255).astype(np.uint8).squeeze()
                 mask_pil = Image.fromarray(mask_img)
                 mask_save_path = os.path.join(
-                    output_dir, f"frame_{out_frame_idx:04d}_obj_{out_obj_id}_mask.png"
+                    object_masks_dir, f"frame_{out_frame_idx:04d}_obj_{out_obj_id}_mask.png"
                 )
                 mask_pil.save(mask_save_path)
             ax.axis('off')
             # Save the visualization to the output directory
-            save_path = os.path.join(output_dir, f"frame_{out_frame_idx:04d}_masks.png")
+            save_path = os.path.join(masks_dir, f"frame_{out_frame_idx:04d}_masks.png")
             plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
             plt.close(fig)
-        print(f"Saved mask visualization to: {output_dir}")
+        print(f"Saved mask visualization to: {masks_dir}")
     else:
         print("Image mode enabled.")
         sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
