@@ -219,7 +219,7 @@ def main():
             for out_obj_id, out_mask in masks.items():
                 show_mask(out_mask, ax, obj_id=out_obj_id)
                 # --- Salva la maschera pura come immagine PNG ---
-                mask_img = (out_mask * 255).astype(np.uint8)
+                mask_img = (out_mask * 255).astype(np.uint8).squeeze()
                 mask_pil = Image.fromarray(mask_img)
                 mask_save_path = os.path.join(
                     output_dir, f"frame_{out_frame_idx:04d}_obj_{out_obj_id}_mask.png"
