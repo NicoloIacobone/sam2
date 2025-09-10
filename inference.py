@@ -74,10 +74,11 @@ def main():
     parser.add_argument('--video', type=bool, default=True, help='If True, process video instead of images (default: True). Video means a directory with frames in .jpg and metadata.json')
     args = parser.parse_args()
 
+    # Final output directory: results/sam2/video_name/masks and results/sam2/video_name/object_masks
     input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
     output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir # here it goes the first frame with the interaction (bounding box)
     masks_dir = os.path.join(output_dir, 'masks') # here it goes all the masks applied to frames
-    object_masks_dir = os.path.join(output_dir, 'object_masks') # here it goes all the masks of each object
+    object_masks_dir = os.path.join(output_dir, 'sam_masks') # here it goes all the masks of each object
 
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(masks_dir, exist_ok=True)
