@@ -75,7 +75,8 @@ def main():
     args = parser.parse_args()
 
     # Final output directory: results/sam2/video_name/masks and results/sam2/video_name/object_masks
-    input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir
+    input_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir + '/frames' # directory with frames in .jpg
+    metadata_path = '/cluster/work/igp_psr/niacobone/examples/kubric/' + args.input_dir + '/metadata.json' # path to metadata.json
     output_dir = '/cluster/work/igp_psr/niacobone/examples/kubric/results/sam2/' + args.input_dir # here it goes the first frame with the interaction (bounding box)
     masks_dir = os.path.join(output_dir, 'masks') # here it goes all the masks applied to frames
     object_masks_dir = os.path.join(output_dir, 'sam_masks') # here it goes all the masks of each object
@@ -129,8 +130,7 @@ def main():
         print(f"Initialized inference state with {len(frame_names)} frames.")
 
         prompts = {}  # dictionary to store prompts for each object
-        # Path to metadata.json
-        metadata_path = os.path.join(input_dir, "metadata.json")
+
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
 
