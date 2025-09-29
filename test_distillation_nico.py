@@ -50,7 +50,8 @@ if device.type == "cuda":
 
 np.random.seed(3)
 
-image = Image.open('/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg')
+# image = Image.open('/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg')
+image = Image.open('/cluster/work/igp_psr/niacobone/examples/photos/car_drift/000000.png')
 image = np.array(image.convert("RGB"))
 
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
