@@ -114,7 +114,9 @@ class SAM2ImagePredictor:
             len(input_image.shape) == 4 and input_image.shape[1] == 3
         ), f"input_image must be of size 1x3xHxW, got {input_image.shape}"
         logging.info("Computing image embeddings for the provided image...")
+        print("[DEBUG] input_image:", input_image.shape)
         backbone_out = self.model.forward_image(input_image)
+        print("[DEBUG] backbone_out:", [b.shape for b in backbone_out])
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
         # Add no_mem_embed, which is added to the lowest rest feat. map during training on videos
         if self.model.directly_add_no_mem_embed:
