@@ -226,6 +226,7 @@ class SAM2AutomaticMaskGenerator:
         crop_boxes, layer_idxs = generate_crop_boxes(
             orig_size, self.crop_n_layers, self.crop_overlap_ratio
         )
+        print(f"[DEBUG] num crop boxes: {len(crop_boxes)} (layers={self.crop_n_layers})")
 
         # Iterate over image crops
         data = MaskData()

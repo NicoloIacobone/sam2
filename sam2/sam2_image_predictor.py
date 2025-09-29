@@ -16,6 +16,15 @@ from sam2.modeling.sam2_base import SAM2Base
 
 from sam2.utils.transforms import SAM2Transforms
 
+def _debug_backbone_out(backbone_out):
+    lines = []
+    for k, v in backbone_out.items():
+        if isinstance(v, torch.Tensor):
+            lines.append(f"{k}: {tuple(v.shape)}")
+        elif isinstance(v, (list, tuple)):
+            lines.append(f"{k}: {[tuple(t.shape) for t in v]}")
+    print("[DEBUG] backbone_out -> " + " | ".join(lines))
+
 
 class SAM2ImagePredictor:
     def __init__(
@@ -116,7 +125,7 @@ class SAM2ImagePredictor:
         logging.info("Computing image embeddings for the provided image...")
         print("[DEBUG] input_image:", input_image.shape)
         backbone_out = self.model.forward_image(input_image)
-        print("[DEBUG] backbone_out:", [b.shape for b in backbone_out])
+        _debug_backbone_out(backbone_out)
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
         # Add no_mem_embed, which is added to the lowest rest feat. map during training on videos
         if self.model.directly_add_no_mem_embed:
