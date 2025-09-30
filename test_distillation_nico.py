@@ -51,8 +51,8 @@ if device.type == "cuda":
 np.random.seed(3)
 
 # image = Image.open('/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg')
-# image_path = '/cluster/work/igp_psr/niacobone/examples/photos/pianta/000.png'
-image_path = '/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg'
+image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
+# image_path = '/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg'
 image = Image.open(image_path)
 image = np.array(image.convert("RGB"))
 print("[DEBUG] image path:", image_path)
