@@ -116,6 +116,7 @@ class SAM2ImagePredictor:
         else:
             raise NotImplementedError("Image format not supported")
 
+        print("[DEBUG] image before transforms:", type(image), image.shape if isinstance(image, np.ndarray) else image.size)
         input_image = self._transforms(image)
         input_image = input_image[None, ...].to(self.device)
 
