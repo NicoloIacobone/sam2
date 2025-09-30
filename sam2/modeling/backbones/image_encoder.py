@@ -36,9 +36,9 @@ class ImageEncoder(nn.Module):
             features, pos = features[: -self.scalp], pos[: -self.scalp]
 
         src = features[-1]
-        print("vision_features shape:", src.shape)
-        print("vision_pos_enc shape:", [p.shape for p in pos])
-        print("backbone_fpn shape:", [f.shape for f in features])
+        print("[DEBUG] vision_features shape:", src.shape)
+        print("[DEBUG] vision_pos_enc shape:", [p.shape for p in pos])
+        print("[DEBUG] backbone_fpn shape:", [f.shape for f in features])
         output = {
             "vision_features": src,
             "vision_pos_enc": pos,
