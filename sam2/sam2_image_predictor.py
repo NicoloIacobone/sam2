@@ -126,7 +126,7 @@ class SAM2ImagePredictor:
         logging.info("Computing image embeddings for the provided image...")
         print("[DEBUG] input_image:", input_image.shape)
         backbone_out = self.model.forward_image(input_image)
-        _debug_backbone_out(backbone_out)
+        # _debug_backbone_out(backbone_out)
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
         # Add no_mem_embed, which is added to the lowest rest feat. map during training on videos
         if self.model.directly_add_no_mem_embed:
