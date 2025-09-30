@@ -39,9 +39,6 @@ source /cluster/scratch/niacobone/sam2/myenv/bin/activate
 echo "Activated Python venv: $(which python)"
 
 # Execute
-
-# exclude_list=("video1" "video2" "video3")  # Add video names (without extension) to exclude
-
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 shape debug..."
 

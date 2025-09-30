@@ -42,16 +42,19 @@ image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-paths = [...]  # lista immagini
-batch = torch.stack([preprocess(Image.open(p)) for p in paths]).to(device)  # Bx3x1024x1024
+batch = preprocess(Image.open(image_path)).unsqueeze(0).to(device)  # 1x3x1024x1024
 
 with torch.no_grad():
     backbone_out = sam2.forward_image(batch)       # forward() in image_encoder
     fpn_levels = backbone_out["backbone_fpn"]      # lista (L) tensori (B,C,H_i,W_i)
     top_feat = backbone_out["vision_features"]     # (B,C,H_L,W_L)
 
+    torch.save(backbone_out, "backbone_out.pt")
+    torch.save(fpn_levels, "fpn_levels.pt")
+    torch.save(top_feat, "top_feat.pt")
 
 ############################################################################################################
+
 # image = Image.open(image_path)
 
 # sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
