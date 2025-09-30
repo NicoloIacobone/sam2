@@ -1,63 +1,28 @@
-"""Script di confronto feature SAM2
+"""Confronto feature SAM2 tra due pipeline già salvate.
 
-Confronta le feature ottenute con preprocessing manuale (funzione preprocess)
-e quelle ottenute tramite la pipeline ufficiale (SAM2ImagePredictor + SAM2Transforms).
+Questo script NON esegue inferenza. Si aspetta due cartelle:
+  official/    contenente: vision_features.pt, backbone_fpn.pt, vision_pos_enc.pt
+  unofficial/  contenente: vision_features.pt, backbone_fpn.pt, vision_pos_enc.pt
 
-Esegue:
- 1. Caricamento modello SAM2
- 2. Selezione immagine (da --image oppure prima valida in --image_dir)
- 3. Estrazione feature manuale via sam2.forward_image
- 4. Estrazione feature ufficiale via predictor.set_image
- 5. Confronto vision_features, livelli FPN, positional encodings
+Confronta:
+  - vision_features (tensor singolo)
+  - backbone_fpn (lista di livelli)
+  - vision_pos_enc (lista di livelli, opzionale con --no_pos)
+
+Metriche stampate per ogni confronto:
+  shape, dtype, min, max, mean, std, sum, hash md5, L2 diff, max abs diff,
+  L2 relativo, allclose, numero elementi fuori tolleranza.
 """
 
 import argparse
-import glob
-import hashlib
 import os
-from typing import List
-
-import numpy as np
+import hashlib
 import torch
-from PIL import Image
-
-from sam2.build_sam import build_sam2
-from sam2.sam2_image_predictor import SAM2ImagePredictor
-
-
-def select_device():
-    if torch.cuda.is_available():
-        dev = torch.device("cuda")
-    elif torch.backends.mps.is_available():
-        dev = torch.device("mps")
-    else:
-        dev = torch.device("cpu")
-    print(f"[INFO] Using device: {dev}")
-    if dev.type == "cuda":
-        torch.autocast("cuda", dtype=torch.bfloat16).__enter__()
-        if torch.cuda.get_device_properties(0).major >= 8:
-            torch.backends.cuda.matmul.allow_tf32 = True
-            torch.backends.cudnn.allow_tf32 = True
-    return dev
-
-
-_MEAN = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-_STD = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
-
-
-def preprocess(pil_img: Image.Image, target: int = 1024) -> torch.Tensor:
-    arr = torch.from_numpy(np.array(pil_img.convert("RGB"))).permute(2, 0, 1).float() / 255.0
-    if arr.shape[1] != target or arr.shape[2] != target:
-        arr = torch.nn.functional.interpolate(
-            arr.unsqueeze(0), size=(target, target), mode="bilinear", align_corners=False
-        ).squeeze(0)
-    return (arr - _MEAN) / _STD
-
+from typing import Sequence
 
 def tensor_hash(t: torch.Tensor) -> str:
     b = t.detach().to("cpu", dtype=torch.float32).numpy().tobytes()
     return hashlib.md5(b).hexdigest()
-
 
 def stats_str(name: str, t: torch.Tensor) -> str:
     t_cpu = t.detach().to("cpu", dtype=torch.float32)
@@ -68,97 +33,87 @@ def stats_str(name: str, t: torch.Tensor) -> str:
         f"sum={t_cpu.sum():.4f} hash={tensor_hash(t)}"
     )
 
-
-def compare_features(a: torch.Tensor, b: torch.Tensor, name: str = "vision_features", atol=1e-5, rtol=1e-4):
+def compare_features(a: torch.Tensor, b: torch.Tensor, name: str, atol: float, rtol: float):
     a_f = a.detach().to(dtype=torch.float32)
     b_f = b.detach().to(dtype=torch.float32)
+    if a_f.shape != b_f.shape:
+        print(f"\n=== Confronto {name} ===")
+        print("[ERRORE] Shape diverse:", a_f.shape, b_f.shape)
+        return
     diff = a_f - b_f
     l2 = torch.linalg.norm(diff).item()
     base = torch.linalg.norm(a_f).item()
-    max_abs = diff.abs().max().item()
     rel = l2 / (base + 1e-12)
+    max_abs = diff.abs().max().item()
     close = torch.allclose(a_f, b_f, atol=atol, rtol=rtol)
     over = (diff.abs() > atol + rtol * a_f.abs()).sum().item()
     print(f"\n=== Confronto {name} ===")
-    print(stats_str("A(manuale)", a))
-    print(stats_str("B(ufficiale)", b))
+    print(stats_str("A(unofficial)", a))
+    print(stats_str("B(official)", b))
     print(
         f"L2 diff={l2:.6f}  rel_L2={rel:.6e}  max_abs={max_abs:.6e}  "
         f"allclose={close}  n_elem_over_tol={over}"
     )
 
+def load_tensor(path: str, descr: str):
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"File mancante ({descr}): {path}")
+    obj = torch.load(path, map_location="cpu")
+    return obj
 
-def find_image_paths(image: str, image_dir: str, exts: List[str]) -> List[str]:
-    if image:
-        return [image]
-    if not os.path.isdir(image_dir):
-        raise FileNotFoundError(f"Directory non trovata: {image_dir}")
-    files = []
-    for e in exts:
-        files.extend(glob.glob(os.path.join(image_dir, f"*{e}")))
-    if not files:
-        raise RuntimeError("Nessuna immagine trovata nella cartella specificata")
-    files.sort()
-    return files
-
+def ensure_sequence(obj, name: str) -> Sequence[torch.Tensor]:
+    if isinstance(obj, (list, tuple)):
+        return obj
+    raise TypeError(f"Il file {name} deve contenere una lista/tupla di tensori, trovato: {type(obj)}")
 
 def main():
-    parser = argparse.ArgumentParser(description="Confronto feature SAM2 manual vs ufficiale")
-    parser.add_argument("--image", type=str, default=None, help="Percorso immagine singola")
-    parser.add_argument(
-        "--image_dir", type=str, default="/cluster/work/igp_psr/niacobone/examples/photos/pianta",
-        help="Directory immagini (usata se --image non è fornito)",
-    )
-    parser.add_argument(
-        "--checkpoint", type=str,
-        default="/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt",
-        help="Percorso checkpoint SAM2",
-    )
-    parser.add_argument(
-        "--config", type=str, default="configs/sam2.1/sam2.1_hiera_l.yaml", help="Config modello"
-    )
+    parser = argparse.ArgumentParser(description="Confronta feature SAM2 tra due cartelle (official/unofficial)")
+    parser.add_argument("--official_dir", type=str, required=True, default="/cluster/scratch/niacobone/sam2/comparison/official", help="Cartella con i file ufficiali")
+    parser.add_argument("--unofficial_dir", type=str, required=True, default="/cluster/scratch/niacobone/sam2/comparison/unofficial", help="Cartella con i file unofficial")
     parser.add_argument("--no_pos", action="store_true", help="Non confrontare i positional encodings")
+    parser.add_argument("--atol", type=float, default=1e-5, help="Tolleranza assoluta allclose")
+    parser.add_argument("--rtol", type=float, default=1e-4, help="Tolleranza relativa allclose")
     args = parser.parse_args()
 
-    device = select_device()
+    print("[INFO] Cartelle input:")
+    print("  official:   ", args.official_dir)
+    print("  unofficial: ", args.unofficial_dir)
 
-    sam2 = build_sam2(
-        args.config, args.checkpoint, device=device, apply_postprocessing=False
-    )
-    sam2.eval()
-    image_paths = find_image_paths(args.image, args.image_dir, [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"])
-    test_path = image_paths[0]
-    print(f"[INFO] Usando immagine: {test_path}")
+    files = ["vision_features.pt", "backbone_fpn.pt", "vision_pos_enc.pt"]
+    paths_off = {f: os.path.join(args.official_dir, f) for f in files}
+    paths_unoff = {f: os.path.join(args.unofficial_dir, f) for f in files}
 
-    pil_img = Image.open(test_path).convert("RGB")
-    target = sam2.image_size if hasattr(sam2, "image_size") else 1024
+    # Caricamento
+    vf_off = load_tensor(paths_off["vision_features.pt"], "vision_features official")
+    vf_unoff = load_tensor(paths_unoff["vision_features.pt"], "vision_features unofficial")
+    fpn_off = load_tensor(paths_off["backbone_fpn.pt"], "backbone_fpn official")
+    fpn_unoff = load_tensor(paths_unoff["backbone_fpn.pt"], "backbone_fpn unofficial")
+    pos_off = load_tensor(paths_off["vision_pos_enc.pt"], "vision_pos_enc official")
+    pos_unoff = load_tensor(paths_unoff["vision_pos_enc.pt"], "vision_pos_enc unofficial")
 
-    # Pipeline manuale
-    manual_tensor = preprocess(pil_img, target=target).unsqueeze(0).to(device)
-    with torch.no_grad():
-        out_manual = sam2.forward_image(manual_tensor)
-    vf_manual = out_manual["vision_features"]
-    fpn_manual = out_manual["backbone_fpn"]
-    pos_manual = out_manual["vision_pos_enc"]
+    # Vision features
+    compare_features(vf_unoff, vf_off, "vision_features", args.atol, args.rtol)
 
-    # Pipeline ufficiale
-    predictor = SAM2ImagePredictor(sam2)
-    predictor.set_image(np.array(pil_img))
-    emb = predictor._image_embeddings
-    vf_official = emb["vision_features"]
-    fpn_official = emb["backbone_fpn"]
-    pos_official = emb["vision_pos_enc"]
+    # Backbone FPN
+    fpn_off_seq = ensure_sequence(fpn_off, "backbone_fpn official")
+    fpn_unoff_seq = ensure_sequence(fpn_unoff, "backbone_fpn unofficial")
+    print("\n[INFO] Confronto backbone_fpn (levels)")
+    if len(fpn_off_seq) != len(fpn_unoff_seq):
+        print(f"[ERRORE] Lunghezza diversa FPN: off={len(fpn_off_seq)} unoff={len(fpn_unoff_seq)}")
+    for i, (tu, to) in enumerate(zip(fpn_unoff_seq, fpn_off_seq)):
+        compare_features(tu, to, f"fpn_level_{i}", args.atol, args.rtol)
 
-    # Confronti
-    compare_features(vf_manual, vf_official, "vision_features")
-    for i, (m_lvl, o_lvl) in enumerate(zip(fpn_manual, fpn_official)):
-        compare_features(m_lvl, o_lvl, name=f"fpn_level_{i}")
+    # Positional encodings
     if not args.no_pos:
-        for i, (pm, po) in enumerate(zip(pos_manual, pos_official)):
-            compare_features(pm, po, name=f"pos_enc_level_{i}")
+        pos_off_seq = ensure_sequence(pos_off, "vision_pos_enc official")
+        pos_unoff_seq = ensure_sequence(pos_unoff, "vision_pos_enc unofficial")
+        print("\n[INFO] Confronto vision_pos_enc (levels)")
+        if len(pos_off_seq) != len(pos_unoff_seq):
+            print(f"[ERRORE] Lunghezza diversa pos_enc: off={len(pos_off_seq)} unoff={len(pos_unoff_seq)}")
+        for i, (tu, to) in enumerate(zip(pos_unoff_seq, pos_off_seq)):
+            compare_features(tu, to, f"pos_enc_level_{i}", args.atol, args.rtol)
 
     print("\n[FINITO] Confronto completato.")
-
 
 if __name__ == "__main__":
     main()
