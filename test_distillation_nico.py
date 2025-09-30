@@ -56,6 +56,7 @@ image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 ############################################################################################################
 
 image = Image.open(image_path)
+image = np.array(image.convert("RGB"))
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
