@@ -68,8 +68,8 @@ def ensure_sequence(obj, name: str) -> Sequence[torch.Tensor]:
 
 def main():
     parser = argparse.ArgumentParser(description="Confronta feature SAM2 tra due cartelle (official/unofficial)")
-    parser.add_argument("--official_dir", type=str, required=True, default="/cluster/scratch/niacobone/sam2/comparison/official", help="Cartella con i file ufficiali")
-    parser.add_argument("--unofficial_dir", type=str, required=True, default="/cluster/scratch/niacobone/sam2/comparison/unofficial", help="Cartella con i file unofficial")
+    parser.add_argument("--official_dir", type=str, required=False, default="/cluster/scratch/niacobone/sam2/comparison/official", help="Cartella con i file ufficiali")
+    parser.add_argument("--unofficial_dir", type=str, required=False, default="/cluster/scratch/niacobone/sam2/comparison/unofficial", help="Cartella con i file unofficial")
     parser.add_argument("--no_pos", action="store_true", help="Non confrontare i positional encodings")
     parser.add_argument("--atol", type=float, default=1e-5, help="Tolleranza assoluta allclose")
     parser.add_argument("--rtol", type=float, default=1e-4, help="Tolleranza relativa allclose")
