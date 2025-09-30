@@ -41,38 +41,38 @@ model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
 
 # UNOFFICIAL
-sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-batch = preprocess(Image.open(image_path)).unsqueeze(0).to(device)  # 1x3x1024x1024
+# batch = preprocess(Image.open(image_path)).unsqueeze(0).to(device)  # 1x3x1024x1024
 
-with torch.no_grad():
-    backbone_out = sam2.forward_image(batch)            # forward() in image_encoder
-    vision_features = backbone_out["vision_features"]
-    vision_pos_enc = backbone_out["vision_pos_enc"]
-    backbone_fpn = backbone_out["backbone_fpn"]
+# with torch.no_grad():
+#     backbone_out = sam2.forward_image(batch)            # forward() in image_encoder
+#     vision_features = backbone_out["vision_features"]
+#     vision_pos_enc = backbone_out["vision_pos_enc"]
+#     backbone_fpn = backbone_out["backbone_fpn"]
 
-    save_dir = "/cluster/scratch/niacobone/sam2/comparison/unofficial"
-    torch.save(vision_features, f"{save_dir}/vision_features.pt")
-    torch.save(vision_pos_enc, f"{save_dir}/vision_pos_enc.pt")
-    torch.save(backbone_fpn, f"{save_dir}/backbone_fpn.pt")
+#     save_dir = "/cluster/scratch/niacobone/sam2/comparison/unofficial"
+#     torch.save(vision_features, f"{save_dir}/vision_features.pt")
+#     torch.save(vision_pos_enc, f"{save_dir}/vision_pos_enc.pt")
+#     torch.save(backbone_fpn, f"{save_dir}/backbone_fpn.pt")
 
-    print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
-    print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
-    print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
+#     print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
+#     print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
+#     print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
 
-    # output = {
-    #         "vision_features": src,
-    #         "vision_pos_enc": pos,
-    #         "backbone_fpn": features,
-    #     }
+#     # output = {
+#     #         "vision_features": src,
+#     #         "vision_pos_enc": pos,
+#     #         "backbone_fpn": features,
+#     #     }
 
 ############################################################################################################
 # OFFICIAL
-# image = Image.open(image_path)
-# image = np.array(image.convert("RGB"))
+image = Image.open(image_path)
+image = np.array(image.convert("RGB"))
 
-# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
-# masks = mask_generator.generate(image)
+masks = mask_generator.generate(image)
