@@ -3,33 +3,19 @@ import os
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from PIL import Image
 
 from sam2.build_sam import build_sam2
+# from sam2.utils.transforms import SAM2Transforms
 from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
 
-def show_anns(anns, borders=True):
-    if len(anns) == 0:
-        return
-    sorted_anns = sorted(anns, key=(lambda x: x['area']), reverse=True)
-    ax = plt.gca()
-    ax.set_autoscale_on(False)
-
-    img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
-    img[:, :, 3] = 0
-    for ann in sorted_anns:
-        m = ann['segmentation']
-        color_mask = np.concatenate([np.random.random(3), [0.5]])
-        img[m] = color_mask 
-        if borders:
-            import cv2
-            contours, _ = cv2.findContours(m.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) 
-            # Try to smooth contours
-            contours = [cv2.approxPolyDP(contour, epsilon=0.01, closed=True) for contour in contours]
-            cv2.drawContours(img, contours, -1, (0, 0, 1, 0.4), thickness=1) 
-
-    ax.imshow(img)
+def preprocess(pil_img, target=1024):
+    arr = torch.from_numpy(np.array(pil_img.convert("RGB"))).permute(2,0,1).float()/255.
+    arr = torch.nn.functional.interpolate(arr.unsqueeze(0), size=(target,target), mode="bilinear", align_corners=False).squeeze(0)
+    mean = torch.tensor([0.485,0.456,0.406]).view(3,1,1)
+    std  = torch.tensor([0.229,0.224,0.225]).view(3,1,1)
+    return (arr - mean)/std
 
 # select the device for computation
 if torch.cuda.is_available():
@@ -50,22 +36,26 @@ if device.type == "cuda":
 
 np.random.seed(3)
 
-# image = Image.open('/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg')
-image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
-# image_path = '/cluster/scratch/niacobone/sam2/notebooks/images/cars.jpg'
-image = Image.open(image_path)
-image = np.array(image.convert("RGB"))
-print("[DEBUG] image path:", image_path)
-print("[DEBUG] image shape:", image.shape)
-
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2)
+paths = [...]  # lista immagini
+batch = torch.stack([preprocess(Image.open(p)) for p in paths]).to(device)  # Bx3x1024x1024
 
-masks = mask_generator.generate(image)
+with torch.no_grad():
+    backbone_out = sam2.forward_image(batch)       # forward() in image_encoder
+    fpn_levels = backbone_out["backbone_fpn"]      # lista (L) tensori (B,C,H_i,W_i)
+    top_feat = backbone_out["vision_features"]     # (B,C,H_L,W_L)
 
-# print("[DEBUG] number of masks:", len(masks))
-# print("[DEBUG] mask keys:", masks[0].keys())
+
+############################################################################################################
+# image = Image.open(image_path)
+
+# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+
+# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+
+# masks = mask_generator.generate(image)
