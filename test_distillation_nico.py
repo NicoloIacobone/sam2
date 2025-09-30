@@ -40,18 +40,18 @@ sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_larg
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
 
-sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-batch = preprocess(Image.open(image_path)).unsqueeze(0).to(device)  # 1x3x1024x1024
+# batch = preprocess(Image.open(image_path)).unsqueeze(0).to(device)  # 1x3x1024x1024
 
-with torch.no_grad():
-    backbone_out = sam2.forward_image(batch)       # forward() in image_encoder
-    fpn_levels = backbone_out["backbone_fpn"]      # lista (L) tensori (B,C,H_i,W_i)
-    top_feat = backbone_out["vision_features"]     # (B,C,H_L,W_L)
+# with torch.no_grad():
+#     backbone_out = sam2.forward_image(batch)       # forward() in image_encoder
+#     fpn_levels = backbone_out["backbone_fpn"]      # lista (L) tensori (B,C,H_i,W_i)
+#     top_feat = backbone_out["vision_features"]     # (B,C,H_L,W_L)
 
-    torch.save(backbone_out, "backbone_out.pt")
-    torch.save(fpn_levels, "fpn_levels.pt")
-    torch.save(top_feat, "top_feat.pt")
+#     torch.save(backbone_out, "backbone_out.pt")
+#     torch.save(fpn_levels, "fpn_levels.pt")
+#     torch.save(top_feat, "top_feat.pt")
 
 ############################################################################################################
 

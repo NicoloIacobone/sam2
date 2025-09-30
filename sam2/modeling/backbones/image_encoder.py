@@ -44,7 +44,13 @@ class ImageEncoder(nn.Module):
             "vision_pos_enc": pos,
             "backbone_fpn": features,
         }
-        
+
+        # Save the three tensors to the specified directory
+        save_dir = "/cluster/scratch/niacobone/sam2/comparison/official"
+        torch.save(src, f"{save_dir}/vision_features.pt")
+        torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
+        torch.save(features, f"{save_dir}/backbone_fpn.pt")
+
         return output
 
 
