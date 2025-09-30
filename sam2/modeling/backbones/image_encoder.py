@@ -55,6 +55,8 @@ class ImageEncoder(nn.Module):
         print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
         print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
 
+        raise Exception("Debugging: Stop after saving tensors")
+
         return output
 
 
