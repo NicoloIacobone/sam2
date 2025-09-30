@@ -45,17 +45,17 @@ class ImageEncoder(nn.Module):
             "backbone_fpn": features,
         }
 
-        # Save the three tensors to the specified directory
-        save_dir = "/cluster/scratch/niacobone/sam2/comparison/official"
-        torch.save(src, f"{save_dir}/vision_features.pt")
-        torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
-        torch.save(features, f"{save_dir}/backbone_fpn.pt")
+        # # Save the three tensors to the specified directory
+        # save_dir = "/cluster/scratch/niacobone/sam2/comparison/official"
+        # torch.save(src, f"{save_dir}/vision_features.pt")
+        # torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
+        # torch.save(features, f"{save_dir}/backbone_fpn.pt")
 
-        print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
-        print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
-        print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
+        # print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
+        # print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
+        # print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
 
-        raise Exception("Debugging: Stop after saving tensors")
+        # raise Exception("Debugging: Stop after saving tensors")
 
         return output
 
