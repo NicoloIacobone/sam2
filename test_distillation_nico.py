@@ -55,10 +55,10 @@ image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 
 ############################################################################################################
 
-# image = Image.open(image_path)
+image = Image.open(image_path)
 
-# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
-# masks = mask_generator.generate(image)
+masks = mask_generator.generate(image)
