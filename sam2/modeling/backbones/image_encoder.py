@@ -51,6 +51,10 @@ class ImageEncoder(nn.Module):
         torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
         torch.save(features, f"{save_dir}/backbone_fpn.pt")
 
+        print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
+        print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
+        print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
+
         return output
 
 
