@@ -66,5 +66,5 @@ mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
 masks = mask_generator.generate(image)
 
-print(len(masks))
-print(masks[0].keys())
+# print("[DEBUG] number of masks:", len(masks))
+# print("[DEBUG] mask keys:", masks[0].keys())
