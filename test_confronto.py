@@ -55,8 +55,8 @@ def main():
     print("  file: ", args.file)
 
 
-    vf_a = load_tensor(args.file, "vision_features.pt")
-    vf_b = load_tensor(args.file, "vision_features_0.pt")
+    vf_a = load_tensor(os.path.join(args.file, "vision_features.pt"), "vision_features.pt")
+    vf_b = load_tensor(os.path.join(args.file, "vision_features_0.pt"), "vision_features_0.pt")
 
     compare_features(vf_a, vf_b, "vision_features", args.atol, args.rtol)
 
