@@ -1,21 +1,19 @@
-import os
-# if using Apple MPS, fall back to CPU for unsupported ops
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import numpy as np
 import torch
-# import matplotlib.pyplot as plt
 from PIL import Image
 
 from sam2.build_sam import build_sam2
 # from sam2.utils.transforms import SAM2Transforms
-from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
+# from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
 
-def preprocess(pil_img, target=1024):
-    arr = torch.from_numpy(np.array(pil_img.convert("RGB"))).permute(2,0,1).float()/255.
-    arr = torch.nn.functional.interpolate(arr.unsqueeze(0), size=(target,target), mode="bilinear", align_corners=False).squeeze(0)
-    mean = torch.tensor([0.485,0.456,0.406]).view(3,1,1)
-    std  = torch.tensor([0.229,0.224,0.225]).view(3,1,1)
-    return (arr - mean)/std
+from sam2.sam2_image_predictor import SAM2ImagePredictor
+
+# def preprocess(pil_img, target=1024):
+#     arr = torch.from_numpy(np.array(pil_img.convert("RGB"))).permute(2,0,1).float()/255.
+#     arr = torch.nn.functional.interpolate(arr.unsqueeze(0), size=(target,target), mode="bilinear", align_corners=False).squeeze(0)
+#     mean = torch.tensor([0.485,0.456,0.406]).view(3,1,1)
+#     std  = torch.tensor([0.229,0.224,0.225]).view(3,1,1)
+#     return (arr - mean)/std
 
 # select the device for computation
 if torch.cuda.is_available():
@@ -36,9 +34,9 @@ if device.type == "cuda":
 
 np.random.seed(3)
 
-sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
-model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
-image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
+# sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
+# model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+# image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
 
 # UNOFFICIAL
 # sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
@@ -68,11 +66,36 @@ image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 
 ############################################################################################################
 # OFFICIAL
+# image = Image.open(image_path)
+# image = np.array(image.convert("RGB"))
+
+# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+
+# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+
+# masks = mask_generator.generate(image)
+
+############################################################################################################
+# OFFICIAL - image_predictor_example.ipynb
+sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
+model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
+
+save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
+
 image = Image.open(image_path)
 image = np.array(image.convert("RGB"))
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2)
+predictor = SAM2ImagePredictor(sam2)
 
-masks = mask_generator.generate(image)
+predictor.set_image(image)  # this calls backbone_out = self.model.forward_image(input_image)
+
+backbone_out = predictor.backbone_out()
+
+vision_features = backbone_out["vision_features"]
+
+torch.save(vision_features, f"{save_dir}/vision_features.pt")
+
+print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")

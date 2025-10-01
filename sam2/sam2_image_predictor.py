@@ -74,6 +74,9 @@ class SAM2ImagePredictor:
             (64, 64),
         ]
 
+        # NICO - saving the teacher features I want to access from the set_image(image) call of my script
+        self._backbone_out = None
+
     @classmethod
     def from_pretrained(cls, model_id: str, **kwargs) -> "SAM2ImagePredictor":
         """
@@ -126,7 +129,11 @@ class SAM2ImagePredictor:
         logging.info("Computing image embeddings for the provided image...")
         print("[DEBUG] input_image:", input_image.shape)
         backbone_out = self.model.forward_image(input_image)
-        # _debug_backbone_out(backbone_out)
+
+        ################################## HOOK OF TEACHER FEATURES #########################################################
+        self._backbone_out = backbone_out  # NICO - saving the backbone_out I want to access from the set_image(image) call of my script
+        #####################################################################################################################
+
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
         # Add no_mem_embed, which is added to the lowest rest feat. map during training on videos
         if self.model.directly_add_no_mem_embed:
@@ -139,6 +146,13 @@ class SAM2ImagePredictor:
         self._features = {"image_embed": feats[-1], "high_res_feats": feats[:-1]}
         self._is_image_set = True
         logging.info("Image embeddings computed.")
+
+    @property
+    def backbone_out(self):
+        """Accessor alternativo (property)."""
+        if self._backbone_out is None:
+            raise RuntimeError("Nessuna immagine impostata: chiama prima set_image().")
+        return self._backbone_out
 
     @torch.no_grad()
     def set_image_batch(
