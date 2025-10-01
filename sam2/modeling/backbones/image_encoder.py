@@ -46,7 +46,7 @@ class ImageEncoder(nn.Module):
         }
 
         # Save the three tensors to the specified directory - for now, I only save vision_features that should be the teacher embeddings
-        save_dir = "/cluster/scratch/niacobone/sam2/comparison/official"
+        save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
         torch.save(src, f"{save_dir}/vision_features.pt")
         # torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
         # torch.save(features, f"{save_dir}/backbone_fpn.pt")
