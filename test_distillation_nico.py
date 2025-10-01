@@ -31,13 +31,15 @@ model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
 # Percorso singola immagine
 image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg"
+
+dir_name = "box_ufficio"
+base_path = "/cluster/work/igp_psr/niacobone"
+input_path = os.path.join(base_path, "examples/photos", dir_name)
+output_path = os.path.join(base_path, "distillation/mapanything", dir_name)
+frames_glob = "*.png"  # frames extension
+os.makedirs(output_path, exist_ok=True)
+
 # Directory con più frame (imposta se multiple_frames=True)
-frames_dir = "/cluster/work/igp_psr/niacobone/examples/photos/box_ufficio"  # esempio
-frames_glob = "*.png"  # pattern dei frame
-
-save_dir = "/cluster/work/igp_psr/niacobone/distillation/mapanything/"
-os.makedirs(save_dir, exist_ok=True)
-
 multiple_frames = True
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
@@ -54,17 +56,17 @@ if not multiple_frames:
     # backbone_fpn = backbone_out["backbone_fpn"]                # lista livelli
     # vision_pos_enc = backbone_out["vision_pos_enc"]            # lista pos
 
-    torch.save(vision_features.cpu(), f"{save_dir}/vision_features.pt")
+    torch.save(vision_features.cpu(), f"{output_path}/vision_features.pt")
     # torch.save(backbone_fpn,         f"{save_dir}/backbone_fpn.pt")
     # torch.save(vision_pos_enc,       f"{save_dir}/vision_pos_enc.pt")
-    print(f"[INFO] Salvato feature singola immagine in {save_dir}")
+    print(f"[INFO] Salvato feature singola immagine in {output_path}")
 
 else:
     # ----- MULTI-FRAME BATCH -----
     # 1. Raccogli lista frame
-    frame_paths = sorted(glob.glob(os.path.join(frames_dir, frames_glob)))
+    frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
     if len(frame_paths) == 0:
-        raise RuntimeError(f"Nessun frame trovato in {frames_dir} con pattern {frames_glob}")
+        raise RuntimeError(f"Nessun frame trovato in {input_path} con pattern {frames_glob}")
 
     frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
     predictor.set_image_batch(frames)  # crea batch e fa forward
@@ -76,7 +78,7 @@ else:
     # vision_pos_enc = backbone_out["vision_pos_enc"]        # lista pos (L)
 
     # Salvataggio batch intero
-    torch.save(vision_features.cpu(), f"{save_dir}/vision_features_batch.pt")
+    torch.save(vision_features.cpu(), f"{output_path}/vision_features.pt")
     # torch.save(backbone_fpn,         f"{save_dir}/backbone_fpn_batch.pt")
     # torch.save(vision_pos_enc,       f"{save_dir}/vision_pos_enc_batch.pt")
 
@@ -86,4 +88,4 @@ else:
     # for i in range(vision_features.size(0)):
     #     torch.save(vision_features[i].cpu(),
     #                f"{per_frame_dir}/vision_features_{i:04d}.pt")
-    print(f"[INFO] Salvate feature batch ({vision_features.size(0)} frame) in {save_dir}")
+    print(f"[INFO] Salvate feature batch ({vision_features.size(0)} frame) in {output_path}")
