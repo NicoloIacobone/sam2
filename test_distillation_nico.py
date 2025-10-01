@@ -78,7 +78,7 @@ else:
     # vision_pos_enc = backbone_out["vision_pos_enc"]        # lista pos (L)
 
     # Salvataggio batch intero
-    torch.save(vision_features.cpu(), f"{output_path}/vision_features.pt")
+    torch.save(vision_features.cpu(), f"{output_path}/teacher_embeddings.pt")
     # torch.save(backbone_fpn,         f"{save_dir}/backbone_fpn_batch.pt")
     # torch.save(vision_pos_enc,       f"{save_dir}/vision_pos_enc_batch.pt")
 
