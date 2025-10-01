@@ -28,34 +28,17 @@ class ImageEncoder(nn.Module):
 
     def forward(self, sample: torch.Tensor):
         # Forward through backbone
-        # print("[DEBUG] self.trunk:", self.trunk)
-        # print("[DEBUG] self.neck:", self.neck)
         features, pos = self.neck(self.trunk(sample)) # trunk is Hiera, neck is FPN = input -> trunk - > neck -> features, pos
         if self.scalp > 0:
             # Discard the lowest resolution features
             features, pos = features[: -self.scalp], pos[: -self.scalp]
 
         src = features[-1]
-        print("[DEBUG] vision_features shape:", src.shape)
-        # print("[DEBUG] vision_pos_enc shape:", [p.shape for p in pos])
-        # print("[DEBUG] backbone_fpn shape:", [f.shape for f in features])
         output = {
             "vision_features": src,
             "vision_pos_enc": pos,
             "backbone_fpn": features,
         }
-
-        # Save the three tensors to the specified directory - for now, I only save vision_features that should be the teacher embeddings
-        # save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
-        # torch.save(src, f"{save_dir}/vision_features.pt")
-        # torch.save(pos, f"{save_dir}/vision_pos_enc.pt")
-        # torch.save(features, f"{save_dir}/backbone_fpn.pt")
-
-        # print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
-        # print(f"[DEBUG] Saved vision_pos_enc to {save_dir}/vision_pos_enc.pt")
-        # print(f"[DEBUG] Saved backbone_fpn to {save_dir}/backbone_fpn.pt")
-
-        # raise Exception("Debugging: Stop after saving tensors")
 
         return output
 
