@@ -1,24 +1,7 @@
-"""Confronto feature SAM2 tra due pipeline già salvate.
-
-Questo script NON esegue inferenza. Si aspetta due cartelle:
-  official/    contenente: vision_features.pt, backbone_fpn.pt, vision_pos_enc.pt
-  unofficial/  contenente: vision_features.pt, backbone_fpn.pt, vision_pos_enc.pt
-
-Confronta:
-  - vision_features (tensor singolo)
-  - backbone_fpn (lista di livelli)
-  - vision_pos_enc (lista di livelli, opzionale con --no_pos)
-
-Metriche stampate per ogni confronto:
-  shape, dtype, min, max, mean, std, sum, hash md5, L2 diff, max abs diff,
-  L2 relativo, allclose, numero elementi fuori tolleranza.
-"""
-
 import argparse
 import os
 import hashlib
 import torch
-from typing import Sequence
 
 def tensor_hash(t: torch.Tensor) -> str:
     b = t.detach().to("cpu", dtype=torch.float32).numpy().tobytes()
@@ -48,8 +31,8 @@ def compare_features(a: torch.Tensor, b: torch.Tensor, name: str, atol: float, r
     close = torch.allclose(a_f, b_f, atol=atol, rtol=rtol)
     over = (diff.abs() > atol + rtol * a_f.abs()).sum().item()
     print(f"\n=== Confronto {name} ===")
-    print(stats_str("A(unofficial)", a))
-    print(stats_str("B(official)", b))
+    print(stats_str("A(vision_features.pt)", a))
+    print(stats_str("B(vision_features_0.pt)", b))
     print(
         f"L2 diff={l2:.6f}  rel_L2={rel:.6e}  max_abs={max_abs:.6e}  "
         f"allclose={close}  n_elem_over_tol={over}"
@@ -61,57 +44,21 @@ def load_tensor(path: str, descr: str):
     obj = torch.load(path, map_location="cpu")
     return obj
 
-def ensure_sequence(obj, name: str) -> Sequence[torch.Tensor]:
-    if isinstance(obj, (list, tuple)):
-        return obj
-    raise TypeError(f"Il file {name} deve contenere una lista/tupla di tensori, trovato: {type(obj)}")
-
 def main():
-    parser = argparse.ArgumentParser(description="Confronta feature SAM2 tra due cartelle (official/unofficial)")
-    parser.add_argument("--official_dir", type=str, required=False, default="/cluster/scratch/niacobone/sam2/comparison/official", help="Cartella con i file ufficiali")
-    parser.add_argument("--unofficial_dir", type=str, required=False, default="/cluster/scratch/niacobone/sam2/comparison/unofficial", help="Cartella con i file unofficial")
-    parser.add_argument("--no_pos", action="store_true", help="Non confrontare i positional encodings")
+    parser = argparse.ArgumentParser(description="Confronta solo vision_features tra due file")
+    parser.add_argument("--file", type=str, default="/cluster/work/igp_psr/niacobone/sam2/teacher_features/", help="File vision_features")
     parser.add_argument("--atol", type=float, default=1e-5, help="Tolleranza assoluta allclose")
     parser.add_argument("--rtol", type=float, default=1e-4, help="Tolleranza relativa allclose")
     args = parser.parse_args()
 
-    print("[INFO] Cartelle input:")
-    print("  official:   ", args.official_dir)
-    print("  unofficial: ", args.unofficial_dir)
+    print("[INFO] File input:")
+    print("  file: ", args.file)
 
-    files = ["vision_features.pt", "backbone_fpn.pt", "vision_pos_enc.pt"]
-    paths_off = {f: os.path.join(args.official_dir, f) for f in files}
-    paths_unoff = {f: os.path.join(args.unofficial_dir, f) for f in files}
 
-    # Caricamento
-    vf_off = load_tensor(paths_off["vision_features.pt"], "vision_features official")
-    vf_unoff = load_tensor(paths_unoff["vision_features.pt"], "vision_features unofficial")
-    fpn_off = load_tensor(paths_off["backbone_fpn.pt"], "backbone_fpn official")
-    fpn_unoff = load_tensor(paths_unoff["backbone_fpn.pt"], "backbone_fpn unofficial")
-    pos_off = load_tensor(paths_off["vision_pos_enc.pt"], "vision_pos_enc official")
-    pos_unoff = load_tensor(paths_unoff["vision_pos_enc.pt"], "vision_pos_enc unofficial")
+    vf_a = load_tensor(args.file, "vision_features.pt")
+    vf_b = load_tensor(args.file, "vision_features_0.pt")
 
-    # Vision features
-    compare_features(vf_unoff, vf_off, "vision_features", args.atol, args.rtol)
-
-    # Backbone FPN
-    fpn_off_seq = ensure_sequence(fpn_off, "backbone_fpn official")
-    fpn_unoff_seq = ensure_sequence(fpn_unoff, "backbone_fpn unofficial")
-    print("\n[INFO] Confronto backbone_fpn (levels)")
-    if len(fpn_off_seq) != len(fpn_unoff_seq):
-        print(f"[ERRORE] Lunghezza diversa FPN: off={len(fpn_off_seq)} unoff={len(fpn_unoff_seq)}")
-    for i, (tu, to) in enumerate(zip(fpn_unoff_seq, fpn_off_seq)):
-        compare_features(tu, to, f"fpn_level_{i}", args.atol, args.rtol)
-
-    # Positional encodings
-    if not args.no_pos:
-        pos_off_seq = ensure_sequence(pos_off, "vision_pos_enc official")
-        pos_unoff_seq = ensure_sequence(pos_unoff, "vision_pos_enc unofficial")
-        print("\n[INFO] Confronto vision_pos_enc (levels)")
-        if len(pos_off_seq) != len(pos_unoff_seq):
-            print(f"[ERRORE] Lunghezza diversa pos_enc: off={len(pos_off_seq)} unoff={len(pos_unoff_seq)}")
-        for i, (tu, to) in enumerate(zip(pos_unoff_seq, pos_off_seq)):
-            compare_features(tu, to, f"pos_enc_level_{i}", args.atol, args.rtol)
+    compare_features(vf_a, vf_b, "vision_features", args.atol, args.rtol)
 
     print("\n[FINITO] Confronto completato.")
 
