@@ -35,7 +35,7 @@ image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 dir_name = "box_ufficio"
 base_path = "/cluster/work/igp_psr/niacobone"
 input_path = os.path.join(base_path, "examples/photos", dir_name)
-output_path = os.path.join(base_path, "distillation/mapanything", dir_name)
+output_path = os.path.join(base_path, "distillation/sam2", dir_name)
 frames_glob = "*.png"  # frames extension
 os.makedirs(output_path, exist_ok=True)
 
