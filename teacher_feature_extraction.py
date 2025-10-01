@@ -32,10 +32,10 @@ model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 # Percorso singola immagine
 image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg"
 
-dir_names = ["yokohama", "tenda_ufficio", "sedia_ufficio", "pianta", "car_drift"]  # Sostituisci con le tue cartelle
+dir_names = ["yokohama", "tenda_ufficio", "sedia_ufficio", "pianta", "car_drift"]
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
-frames_globs = ["*.jpg", "*.png", "*.png", "*.png", "*.png"]  # esempio: specifica pattern diversi per ogni dir_name
+frames_globs = ["*.jpg", "*.png", "*.png", "*.png", "*.png"]
 
 # Directory con più frame (imposta se multiple_frames=True)
 multiple_frames = True

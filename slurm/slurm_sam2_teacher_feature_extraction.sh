@@ -42,7 +42,7 @@ echo "Activated Python venv: $(which python)"
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 teacher feature extraction..."
 
-python test_distillation_nico.py
+python teacher_feature_extraction.py
 
 echo "=== Job finished at $(date) ==="
 start_time=${SLURM_JOB_START_TIME:-$(date +%s)}
