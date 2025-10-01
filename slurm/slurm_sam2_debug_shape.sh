@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Specify job name.
-#SBATCH --job-name=sam2_debug_shape
+#SBATCH --job-name=sam2_teacher_feature_extraction
 #
 # Specify output file.
 #SBATCH --output=sam2_%j.log
@@ -13,7 +13,7 @@
 #SBATCH --open-mode=append
 #
 # Specify time limit.
-#SBATCH --time=00:05:00
+#SBATCH --time=00:20:00
 #
 # Specify number of tasks.
 #SBATCH --ntasks=1
@@ -40,7 +40,7 @@ echo "Activated Python venv: $(which python)"
 
 # Execute
 cd /cluster/scratch/niacobone/sam2
-echo "Starting sam2 shape debug..."
+echo "Starting sam2 teacher feature extraction..."
 
 python test_distillation_nico.py
 
