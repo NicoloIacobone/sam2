@@ -35,7 +35,7 @@ image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 frames_dir = "/cluster/work/igp_psr/niacobone/examples/photos/box_ufficio"  # esempio
 frames_glob = "*.png"  # pattern dei frame
 
-save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
+save_dir = "/cluster/work/igp_psr/niacobone/distillation/mapanything/"
 os.makedirs(save_dir, exist_ok=True)
 
 multiple_frames = True
