@@ -92,7 +92,7 @@ predictor = SAM2ImagePredictor(sam2)
 
 predictor.set_image(image)  # this calls backbone_out = self.model.forward_image(input_image)
 
-backbone_out = predictor.backbone_out()
+backbone_out = predictor.backbone_out
 
 vision_features = backbone_out["vision_features"]
 

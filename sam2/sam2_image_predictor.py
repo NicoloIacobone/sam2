@@ -132,6 +132,7 @@ class SAM2ImagePredictor:
 
         ################################## HOOK OF TEACHER FEATURES #########################################################
         self._backbone_out = backbone_out  # NICO - saving the backbone_out I want to access from the set_image(image) call of my script
+        print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
         #####################################################################################################################
 
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
@@ -149,7 +150,7 @@ class SAM2ImagePredictor:
 
     @property
     def backbone_out(self):
-        """Accessor alternativo (property)."""
+        """ Access as property """
         if self._backbone_out is None:
             raise RuntimeError("Nessuna immagine impostata: chiama prima set_image().")
         return self._backbone_out
