@@ -185,6 +185,12 @@ class SAM2ImagePredictor:
         ), f"img_batch must be of size Bx3xHxW, got {img_batch.shape}"
         logging.info("Computing image embeddings for the provided images...")
         backbone_out = self.model.forward_image(img_batch)
+
+        ################################## HOOK OF TEACHER FEATURES #########################################################
+        self._backbone_out = backbone_out  # NICO - saving the backbone_out I want to access from the set_image(image) call of my script
+        print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
+        #####################################################################################################################
+
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
         # Add no_mem_embed, which is added to the lowest rest feat. map during training on videos
         if self.model.directly_add_no_mem_embed:
@@ -491,3 +497,4 @@ class SAM2ImagePredictor:
         self._features = None
         self._orig_hw = None
         self._is_batch = False
+        self._backbone_out = None   # <--- NICO

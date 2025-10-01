@@ -1,3 +1,5 @@
+import os
+import glob
 import numpy as np
 import torch
 from PIL import Image
@@ -77,25 +79,91 @@ np.random.seed(3)
 
 ############################################################################################################
 # OFFICIAL - image_predictor_example.ipynb
+# sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
+# model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+# image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
+
+# save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
+
+# image = Image.open(image_path)
+# image = np.array(image.convert("RGB"))
+
+# sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+
+# predictor = SAM2ImagePredictor(sam2)
+
+# predictor.set_image(image)  # this calls backbone_out = self.model.forward_image(input_image)
+
+# backbone_out = predictor.backbone_out
+
+# vision_features = backbone_out["vision_features"]
+
+# torch.save(vision_features, f"{save_dir}/vision_features.pt")
+
+# print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
+
+############################################################################################################
+# OFFICIAL - image_predictor_example.ipynb - MULTI-FRAME BATCH
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
-image_path = '/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg'
+
+# Percorso singola immagine
+image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg"
+# Directory con più frame (imposta se multiple_frames=True)
+frames_dir = "/cluster/work/igp_psr/niacobone/examples/photos/car_drift"  # esempio
+frames_glob = "*.png"  # pattern dei frame
 
 save_dir = "/cluster/work/igp_psr/niacobone/sam2/teacher_features"
+os.makedirs(save_dir, exist_ok=True)
 
-image = Image.open(image_path)
-image = np.array(image.convert("RGB"))
+multiple_frames = True
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
-
+sam2.eval()
 predictor = SAM2ImagePredictor(sam2)
 
-predictor.set_image(image)  # this calls backbone_out = self.model.forward_image(input_image)
+if not multiple_frames:
+    # ----- SINGOLA IMMAGINE -----
+    pil_img = Image.open(image_path).convert("RGB")
+    np_img = np.array(pil_img)
+    predictor.set_image(np_img)  # chiamata ufficiale
+    backbone_out = predictor.backbone_out
+    vision_features = backbone_out["vision_features"]          # (1,C,H,W)
+    # backbone_fpn = backbone_out["backbone_fpn"]                # lista livelli
+    # vision_pos_enc = backbone_out["vision_pos_enc"]            # lista pos
 
-backbone_out = predictor.backbone_out
+    torch.save(vision_features.cpu(), f"{save_dir}/vision_features.pt")
+    # torch.save(backbone_fpn,         f"{save_dir}/backbone_fpn.pt")
+    # torch.save(vision_pos_enc,       f"{save_dir}/vision_pos_enc.pt")
+    print(f"[INFO] Salvato feature singola immagine in {save_dir}")
 
-vision_features = backbone_out["vision_features"]
+else:
+    # ----- MULTI-FRAME BATCH -----
+    # 1. Raccogli lista frame
+    frame_paths = sorted(glob.glob(os.path.join(frames_dir, frames_glob)))
+    if len(frame_paths) == 0:
+        raise RuntimeError(f"Nessun frame trovato in {frames_dir} con pattern {frames_glob}")
 
-torch.save(vision_features, f"{save_dir}/vision_features.pt")
+    frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
+    predictor.set_image_batch(frames)  # crea batch e fa forward
 
-print(f"[DEBUG] Saved vision_features to {save_dir}/vision_features.pt")
+    backbone_out = predictor.backbone_out
+
+    vision_features = backbone_out["vision_features"]      # (B,C,H,W)
+    # backbone_fpn = backbone_out["backbone_fpn"]            # lista di L tensori (B,C,h_i,w_i)
+    # vision_pos_enc = backbone_out["vision_pos_enc"]        # lista pos (L)
+
+    # Salvataggio batch intero
+    torch.save(vision_features.cpu(), f"{save_dir}/vision_features_batch.pt")
+    # torch.save(backbone_fpn,         f"{save_dir}/backbone_fpn_batch.pt")
+    # torch.save(vision_pos_enc,       f"{save_dir}/vision_pos_enc_batch.pt")
+
+    # (Opzionale) salvataggio per-frame
+    # per_frame_dir = os.path.join(save_dir, "per_frame")
+    # os.makedirs(per_frame_dir, exist_ok=True)
+    # for i in range(vision_features.size(0)):
+    #     torch.save(vision_features[i].cpu(),
+    #                f"{per_frame_dir}/vision_features_{i:04d}.pt")
+    print(f"[INFO] Salvate feature batch ({vision_features.size(0)} frame) in {save_dir}")
+
+print("[DONE]")
