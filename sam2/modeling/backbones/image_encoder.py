@@ -92,7 +92,7 @@ class ImageEncoder(nn.Module):
         # DEBUG: CONSISTENCY TEST
         # Debug: sovrascrivi vision_features con i dati presi da un file locale
         consistency_test = True
-        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/box_ufficio/student_embeddings.pt"  # Modifica questo path per il debug
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/teacher/box_ufficio/teacher_embeddings.pt"  # Modifica questo path per il debug
         if consistency_test:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 
