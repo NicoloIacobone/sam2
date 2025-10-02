@@ -76,13 +76,15 @@ sam2.num_feature_levels = 1
 # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
 mask_generator = SAM2AutomaticMaskGenerator(
     sam2,
-    points_per_side=16,
+    points_per_side=8,          # ridotto (64 punti)
+    multimask_output=False,     # 1 maschera per punto
     pred_iou_thresh=0.0,
     stability_score_thresh=0.0,
     mask_threshold=-5.0,
     min_mask_region_area=0,
     box_nms_thresh=1.0,
     crop_n_layers=0,
+    output_mode="binary_mask",
 )
 
 # per questo test considero solo la prima immagine
