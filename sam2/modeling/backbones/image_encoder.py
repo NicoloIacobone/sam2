@@ -10,6 +10,55 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+def mean_std_difference(student_embeddings, teacher_embeddings):
+    """
+    Computes and prints the mean and standard deviation of student and teacher embeddings for each batch,
+    as well as the mean and standard deviation of their differences. Also calculates and prints the average
+    difference between the means and standard deviations across all batches.
+
+    Args:
+        student_embeddings (torch.Tensor): A batch of student embeddings of shape (B, ...), where B is the batch size.
+        teacher_embeddings (torch.Tensor): A batch of teacher embeddings of shape (B, ...), where B is the batch size.
+
+    Prints:
+        For each batch:
+            - Student mean and standard deviation
+            - Teacher mean and standard deviation
+            - Mean and standard deviation of the difference between student and teacher embeddings
+        At the end:
+            - Average difference between means across all batches
+            - Average difference between standard deviations across all batches
+    """
+    B = student_embeddings.shape[0]
+
+    student_means = []
+    student_stds = []
+    teacher_means = []
+    teacher_stds = []
+
+    for i in range(B):
+        print(f"Batch {i}:")
+        s_mean = student_embeddings[i].mean().item()
+        s_std = student_embeddings[i].std().item()
+        t_mean = teacher_embeddings[i].mean().item()
+        t_std = teacher_embeddings[i].std().item()
+        print("  Student mean:", s_mean)
+        print("  Student std:", s_std)
+        print("  Teacher mean:", t_mean)
+        print("  Teacher std:", t_std)
+        diff = student_embeddings[i] - teacher_embeddings[i]
+        print("  Difference mean:", diff.mean().item())
+        print("  Difference std:", diff.std().item())
+        student_means.append(s_mean)
+        student_stds.append(s_std)
+        teacher_means.append(t_mean)
+        teacher_stds.append(t_std)
+
+    mean_diff = sum(student_means) / B - sum(teacher_means) / B
+    std_diff = sum(student_stds) / B - sum(teacher_stds) / B
+    print("\nAverage difference between means:", mean_diff)
+    print("Average difference between stds:", std_diff)
+
 
 class ImageEncoder(nn.Module):
     def __init__(
@@ -45,7 +94,7 @@ class ImageEncoder(nn.Module):
         consistency_test = True
         debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/box_ufficio/student_embeddings.pt"  # Modifica questo path per il debug
         if consistency_test:
-            loaded = torch.load(debug_vision_features_path, map_location=src.device)
+            loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 
             # Controlla la shape di output["vision_features"]
             vision_features_shape = output["vision_features"].shape
@@ -60,6 +109,8 @@ class ImageEncoder(nn.Module):
                 print(f"[DEBUG] Replaced vision_features with loaded feature of shape: {loaded_feature.unsqueeze(0).shape}")
             else:
                 raise ValueError(f"Unexpected shape for vision_features: {vision_features_shape}")
+            
+        mean_std_difference(output["vision_features"], loaded)
 
         return output
 
