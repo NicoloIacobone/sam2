@@ -68,6 +68,7 @@ model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 # disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
+sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
