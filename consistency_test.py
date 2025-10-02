@@ -72,7 +72,18 @@ sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2)
+# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+# DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
+mask_generator = SAM2AutomaticMaskGenerator(
+    sam2,
+    points_per_side=16,
+    pred_iou_thresh=0.0,
+    stability_score_thresh=0.0,
+    mask_threshold=-5.0,
+    min_mask_region_area=0,
+    box_nms_thresh=1.0,
+    crop_n_layers=0,
+)
 
 # per questo test considero solo la prima immagine
 image = frames[0]
