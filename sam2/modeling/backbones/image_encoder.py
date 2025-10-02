@@ -53,9 +53,11 @@ class ImageEncoder(nn.Module):
             if len(vision_features_shape) == 3:
                 # B x H x W
                 output["vision_features"] = loaded_feature
+                print(f"[DEBUG] Replaced vision_features with loaded feature of shape: {loaded_feature.shape}")
             elif len(vision_features_shape) == 4 and vision_features_shape[0] == 1:
                 # 1 x B x H x W
                 output["vision_features"] = loaded_feature.unsqueeze(0)
+                print(f"[DEBUG] Replaced vision_features with loaded feature of shape: {loaded_feature.unsqueeze(0).shape}")
             else:
                 raise ValueError(f"Unexpected shape for vision_features: {vision_features_shape}")
 
