@@ -84,7 +84,6 @@ mask_generator = SAM2AutomaticMaskGenerator(
     min_mask_region_area=0,
     box_nms_thresh=1.0,
     crop_n_layers=0,
-    output_mode="binary_mask",
 )
 
 # per questo test considero solo la prima immagine
