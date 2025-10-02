@@ -40,6 +40,25 @@ class ImageEncoder(nn.Module):
             "backbone_fpn": features,
         }
 
+        # DEBUG: CONSISTENCY TEST
+        # Debug: sovrascrivi vision_features con i dati presi da un file locale
+        consistency_test = False
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/box_ufficio/student_embeddings.pt"  # Modifica questo path per il debug
+        if consistency_test:
+            loaded = torch.load(debug_vision_features_path, map_location=src.device)
+
+            # Controlla la shape di output["vision_features"]
+            vision_features_shape = output["vision_features"].shape
+            loaded_feature = loaded[0]
+            if len(vision_features_shape) == 3:
+                # B x H x W
+                output["vision_features"] = loaded_feature
+            elif len(vision_features_shape) == 4 and vision_features_shape[0] == 1:
+                # 1 x B x H x W
+                output["vision_features"] = loaded_feature.unsqueeze(0)
+            else:
+                raise ValueError(f"Unexpected shape for vision_features: {vision_features_shape}")
+
         return output
 
 
