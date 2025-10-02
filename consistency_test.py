@@ -63,7 +63,8 @@ frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
 frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
 
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
-model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+# model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+model_cfg = "configs/sam2.1/sam2.1_hiera_l_nico.yaml" # I set use_high_res_features_in_sam: false
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 
@@ -77,7 +78,7 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency.png")
+output_file = os.path.join(output_path, "masks_consistency_use_high_res_features_false.png")
 # output_file = os.path.join(output_path, "masks_original.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
