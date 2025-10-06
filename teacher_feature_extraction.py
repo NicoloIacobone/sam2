@@ -39,7 +39,7 @@ image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg
 dir_names = ["yokohama", "tenda_ufficio", "sedia_ufficio", "pianta", "car_drift"]
 base_path = "/cluster/work/igp_psr/niacobone"
 output_dir = "/cluster/scratch/niacobone/distillation/sam2/coco2017"
-COCO2017_PATH = "/cluster/work/igp_psr/niacobone/"
+COCO2017_PATH = "/cluster/work/igp_psr/niacobone/coco2017"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_globs = ["*.jpg", "*.png", "*.png", "*.png", "*.png"]
 
