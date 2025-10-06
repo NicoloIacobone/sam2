@@ -59,7 +59,7 @@ if not image_paths:
     raise Exception("Nessuna immagine trovata")
 print(f"[INFO] Trovate {len(image_paths)} immagini in {COCO2017_PATH}. Salvataggio in {output_dir}")
 
-for idx, img_path in enumerate(image_paths[:50]):
+for idx, img_path in enumerate(image_paths):
     try:
         pil_img = Image.open(img_path).convert("RGB")
         np_img = np.array(pil_img)
@@ -69,9 +69,9 @@ for idx, img_path in enumerate(image_paths[:50]):
         stem = os.path.splitext(os.path.basename(img_path))[0]
         save_path = os.path.join(output_dir, f"{stem}.pt")
         torch.save(vision_features.cpu(), save_path)
-        print(f"  -> {idx+1}/50 salvate (ultima: {os.path.basename(save_path)})")
-        # if (idx + 1) % 50 == 0 or idx == len(image_paths) - 1:
-        #     print(f"  -> {idx+1}/{len(image_paths)} salvate (ultima: {os.path.basename(save_path)})")
+        # print(f"  -> {idx+1}/50 salvate (ultima: {os.path.basename(save_path)})")
+        if (idx + 1) % 50 == 0 or idx == len(image_paths) - 1:
+            print(f"  -> {idx+1}/{len(image_paths)} salvate (ultima: {os.path.basename(save_path)})")
     except Exception as e:
         print(f"[ERRORE] Immagine {img_path} saltata: {e}")
 
