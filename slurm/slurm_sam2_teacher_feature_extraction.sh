@@ -13,7 +13,7 @@
 #SBATCH --open-mode=append
 #
 # Specify time limit.
-#SBATCH --time=02:00:00
+#SBATCH --time=00:10:00
 #
 # Specify number of tasks.
 #SBATCH --ntasks=1
