@@ -119,7 +119,7 @@ class SAM2ImagePredictor:
         else:
             raise NotImplementedError("Image format not supported")
 
-        print("[DEBUG] image before transforms:", type(image), image.shape if isinstance(image, np.ndarray) else image.size)
+        # print("[DEBUG] image before transforms:", type(image), image.shape if isinstance(image, np.ndarray) else image.size)
         input_image = self._transforms(image)
         input_image = input_image[None, ...].to(self.device)
 
@@ -127,12 +127,12 @@ class SAM2ImagePredictor:
             len(input_image.shape) == 4 and input_image.shape[1] == 3
         ), f"input_image must be of size 1x3xHxW, got {input_image.shape}"
         logging.info("Computing image embeddings for the provided image...")
-        print("[DEBUG] input_image:", input_image.shape)
+        # print("[DEBUG] input_image:", input_image.shape)
         backbone_out = self.model.forward_image(input_image)
 
         ################################## HOOK OF TEACHER FEATURES #########################################################
         self._backbone_out = backbone_out  # NICO - saving the backbone_out I want to access from the set_image(image) call of my script
-        print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
+        # print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
         #####################################################################################################################
 
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
@@ -188,7 +188,7 @@ class SAM2ImagePredictor:
 
         ################################## HOOK OF TEACHER FEATURES #########################################################
         self._backbone_out = backbone_out  # NICO - saving the backbone_out I want to access from the set_image(image) call of my script
-        print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
+        # print("[DEBUG] backbone_out['vision_features'].shape:", backbone_out['vision_features'].shape)
         #####################################################################################################################
 
         _, vision_feats, _, _ = self.model._prepare_backbone_features(backbone_out)
