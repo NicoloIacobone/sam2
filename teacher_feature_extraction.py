@@ -59,7 +59,7 @@ if not image_paths:
     raise Exception("Nessuna immagine trovata")
 print(f"[INFO] Trovate {len(image_paths)} immagini in {COCO2017_PATH}. Salvataggio in {output_dir}")
 
-for idx, img_path in enumerate(image_paths[:5]):
+for idx, img_path in enumerate(image_paths):
     try:
         pil_img = Image.open(img_path).convert("RGB")
         np_img = np.array(pil_img)
