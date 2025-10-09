@@ -42,7 +42,7 @@ echo "Activated Python venv: $(which python)"
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 consistency test..."
 
-python consistency_test.py
+python consistency_test2.py
 
 echo "=== Job finished at $(date) ==="
 start_time=${SLURM_JOB_START_TIME:-$(date +%s)}
