@@ -54,7 +54,8 @@ if device.type == "cuda":
 dir_name = "original"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
-frames_glob = "*.png"
+# frames_glob = "*.png"
+frames_glob = "*.jpg"
 
 input_path = os.path.join(base_path, "examples/photos", dir_name)
 output_path = os.path.join(base_path, "consistency_test", dir_name)
