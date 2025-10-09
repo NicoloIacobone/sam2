@@ -87,15 +87,14 @@ mask_generator = SAM2AutomaticMaskGenerator(sam2)
 # )
 
 # per questo test considero solo la prima immagine
-image = frames[0]
-masks = mask_generator.generate(image)
+for idx, image in enumerate(frames):
+    masks = mask_generator.generate(image)
 
-plt.figure(figsize=(20, 20))
-plt.imshow(image)
-show_anns(masks)
-plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency_overfitting.png")
-# output_file = os.path.join(output_path, "masks_original.png")
-plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
-plt.close()
-print(f"Saved to {output_file}")
+    plt.figure(figsize=(20, 20))
+    plt.imshow(image)
+    show_anns(masks)
+    plt.axis('off')
+    output_file = os.path.join(output_path, f"masks_consistency_overfitting_{idx:03d}.png")
+    plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+    plt.close()
+    print(f"Saved to {output_file}")
