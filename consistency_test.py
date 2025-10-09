@@ -53,16 +53,17 @@ def main():
             torch.backends.cuda.matmul.allow_tf32 = True
             torch.backends.cudnn.allow_tf32 = True
 
-    dir_name = "box_ufficio"
+    dir_name = "original"
     base_path = "/cluster/work/igp_psr/niacobone"
     # frames_glob deve essere una lista, appaiata con dir_names
     # frames_glob = "*.png"
-    frames_glob = "*.jpg"
+    # frames_glob = "*.jpg"
 
     input_path = os.path.join(base_path, "examples/photos", dir_name)
     output_path = os.path.join(base_path, "consistency_test", dir_name)
     os.makedirs(output_path, exist_ok=True)
-    frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
+    frame_paths = [os.path.join(input_path, fname) for fname in os.listdir(input_path) if fname.endswith(('.jpg', '.png'))]
+    frame_paths = sorted(frame_paths)
     print("Frames path:", frame_paths)
     frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
 
