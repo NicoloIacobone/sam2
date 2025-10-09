@@ -1,4 +1,5 @@
 # This script uses the features produced by the additional head of the student model to infer using the teacher decoder
+print("PORCO DIO")
 import os
 import numpy as np
 import torch
