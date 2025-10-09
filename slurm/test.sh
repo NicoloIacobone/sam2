@@ -29,6 +29,7 @@
 
 module load stack/2024-06 python/3.11 cuda/12.4
 source /cluster/scratch/niacobone/sam2/myenv/bin/activate
+cd /cluster/scratch/niacobone/sam2
 echo "Starting test..."
 
 python -u test.py
