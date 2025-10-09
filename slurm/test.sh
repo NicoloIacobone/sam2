@@ -31,9 +31,4 @@ module load stack/2024-06 python/3.11 cuda/12.4
 source /cluster/scratch/niacobone/sam2/myenv/bin/activate
 echo "Starting test..."
 
-python -u - <<'PY'
-print("START", flush=True)
-import torch
-print("import torch OK", torch.__version__, flush=True)
-print("cuda.is_available(): ", torch.cuda.is_available(), flush=True)
-PY
+python -u test.py
