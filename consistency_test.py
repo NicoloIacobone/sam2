@@ -61,6 +61,7 @@ input_path = os.path.join(base_path, "examples/photos", dir_name)
 output_path = os.path.join(base_path, "consistency_test", dir_name)
 os.makedirs(output_path, exist_ok=True)
 frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
+print("Frames path:", frame_paths)
 frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
 
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
@@ -68,12 +69,17 @@ model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 # model_cfg = "configs/sam2.1/sam2.1_hiera_l_nico.yaml" # I set use_high_res_features_in_sam: false
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+print("Model loaded.")
 # disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
 sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
+print("Generating masks...")
+
 mask_generator = SAM2AutomaticMaskGenerator(sam2)
+
+print("Mask generator created.")
 # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
 # mask_generator = SAM2AutomaticMaskGenerator(
 #     sam2,
@@ -89,6 +95,7 @@ mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
 # per questo test considero solo la prima immagine
 for idx, image in enumerate(frames):
+    print(f"Processing image {idx+1}/{len(frames)}")
     masks = mask_generator.generate(image)
 
     plt.figure(figsize=(20, 20))
