@@ -51,10 +51,10 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "box_ufficio"
+dir_name = "original"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
-frames_glob = "*.png"
+frames_glob = "*.jpg"
 
 input_path = os.path.join(base_path, "examples/photos", dir_name)
 output_path = os.path.join(base_path, "consistency_test", dir_name)
@@ -94,7 +94,7 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency_overfitting.png")
+output_file = os.path.join(output_path, "masks_consistency_coco.png")
 # output_file = os.path.join(output_path, "masks_original.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
