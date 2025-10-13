@@ -40,7 +40,7 @@ class ImageEncoder(nn.Module):
         }
 
         # DEBUG: CONSISTENCY TEST
-        consistency_test = True
+        consistency_test = False
         debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/original/student_embeddings.pt"  # Modifica questo path per il debug
         if consistency_test:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
