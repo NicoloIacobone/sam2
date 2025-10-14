@@ -81,12 +81,18 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency_coco.png")
+output_file = os.path.join(output_path, "masks_consistency_coco_4999.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
 
 # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
+sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+# disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
+sam2.sam_mask_decoder.use_high_res_features = False
+sam2.use_high_res_features_in_sam = False
+sam2.num_feature_levels = 1
+
 mask_generator = SAM2AutomaticMaskGenerator(
     sam2,
     points_per_side=8,          # ridotto (64 punti)
@@ -103,7 +109,7 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency_coco_no_thresh.png")
+output_file = os.path.join(output_path, "masks_consistency_coco_no_thresh_4999.png")
 # output_file = os.path.join(output_path, "masks_original.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
