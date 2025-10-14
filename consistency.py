@@ -72,19 +72,19 @@ sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
-# mask_generator = SAM2AutomaticMaskGenerator(sam2)
+mask_generator = SAM2AutomaticMaskGenerator(sam2)
 
-mask_generator = SAM2AutomaticMaskGenerator(
-    sam2,
-    points_per_side=8,          # ridotto (64 punti)
-    multimask_output=False,     # 1 maschera per punto
-    pred_iou_thresh=0.0,
-    stability_score_thresh=0.0,
-    mask_threshold=-5.0,
-    min_mask_region_area=0,
-    box_nms_thresh=1.0,
-    crop_n_layers=0,
-)
+# mask_generator = SAM2AutomaticMaskGenerator(
+#     sam2,
+#     points_per_side=8,          # ridotto (64 punti)
+#     multimask_output=False,     # 1 maschera per punto
+#     pred_iou_thresh=0.0,
+#     stability_score_thresh=0.0,
+#     mask_threshold=-5.0,
+#     min_mask_region_area=0,
+#     box_nms_thresh=1.0,
+#     crop_n_layers=0,
+# )
 # per questo test considero solo la prima immagine
 image = frames[0]
 masks = mask_generator.generate(image)
@@ -93,7 +93,7 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "masks_consistency_coco_4999.png")
+output_file = os.path.join(output_path, "ep5000_lr0001_normFalse_1000.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
