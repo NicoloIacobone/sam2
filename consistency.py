@@ -6,6 +6,7 @@ import torch
 import matplotlib.pyplot as plt
 from PIL import Image
 import glob
+import cv2
 
 from sam2.build_sam import build_sam2
 from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator
@@ -24,7 +25,6 @@ def show_anns(anns, borders=True):
         color_mask = np.concatenate([np.random.random(3), [0.5]])
         img[m] = color_mask 
         if borders:
-            import cv2
             contours, _ = cv2.findContours(m.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) 
             # Try to smooth contours
             contours = [cv2.approxPolyDP(contour, epsilon=0.01, closed=True) for contour in contours]
