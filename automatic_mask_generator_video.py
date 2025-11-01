@@ -100,9 +100,8 @@ for out_frame_idx, out_obj_ids, out_mask_logits in predictor.propagate_in_video(
         for i, out_obj_id in enumerate(out_obj_ids)
     }
 
-out_file = os.path.join(input_path, "video_segments.pkl")
-with open(out_file, "wb") as f:
-    pickle.dump(video_segments, f, protocol=pickle.HIGHEST_PROTOCOL)
+out_file = os.path.join(input_path, "video_segments.npy")
+np.save(out_file, video_segments, allow_pickle=True)
 print(f"video_segments salvato in {out_file}")
 
 # input_path = os.path.join(base_path, "examples/photos", dir_name)
