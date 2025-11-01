@@ -77,6 +77,8 @@ predictor = build_sam2_video_predictor(model_cfg, sam2_checkpoint, device=device
 
 inference_state = predictor.init_state(video_path=input_path)
 
+prompts = {}  # hold all the clicks we add for visualization
+
 ann_frame_idx = 0  # the frame index we interact with
 ann_obj_id = 1  # give a unique id to each object we interact with (it can be any integers)
 
@@ -84,6 +86,25 @@ ann_obj_id = 1  # give a unique id to each object we interact with (it can be an
 points = np.array([[2500, 1800], [1900, 1900]], dtype=np.float32)
 # for labels, `1` means positive click and `0` means negative click
 labels = np.array([1, 1], np.int32)
+prompts[ann_obj_id] = points, labels
+
+_, out_obj_ids, out_mask_logits = predictor.add_new_points_or_box(
+    inference_state=inference_state,
+    frame_idx=ann_frame_idx,
+    obj_id=ann_obj_id,
+    points=points,
+    labels=labels,
+)
+
+ann_obj_id = 3  # give a unique id to each object we interact with (it can be any integers)
+# Let's now move on to the second object we want to track (giving it object id `3`)
+# with a positive click at (x, y) = (500, 300)
+points = np.array([[500, 300]], dtype=np.float32)
+# for labels, `1` means positive click and `0` means negative click
+labels = np.array([1], np.int32)
+prompts[ann_obj_id] = points, labels
+
+# `add_new_points_or_box` returns masks for all objects added so far on this interacted frame
 _, out_obj_ids, out_mask_logits = predictor.add_new_points_or_box(
     inference_state=inference_state,
     frame_idx=ann_frame_idx,
