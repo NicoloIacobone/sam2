@@ -63,13 +63,20 @@ print(f"[INFO] Trovate {len(image_paths)} immagini in {COCO2017_PATH}. Salvatagg
 
 for idx, img_path in enumerate(image_paths):
     try:
+        stem = os.path.splitext(os.path.basename(img_path))[0]
+        save_path = os.path.join(output_dir, f"{stem}.pt")
+        
+        # Skip se già processata
+        if os.path.exists(save_path):
+            if (idx + 1) % 500 == 0:
+                print(f"  -> {idx+1}/{len(image_paths)} (skip: {os.path.basename(save_path)} già esistente)")
+            continue
+        
         pil_img = Image.open(img_path).convert("RGB")
         np_img = np.array(pil_img)
         predictor.set_image(np_img)
         backbone_out = predictor.backbone_out
         vision_features = backbone_out["vision_features"]  # (1,C,H,W)
-        stem = os.path.splitext(os.path.basename(img_path))[0]
-        save_path = os.path.join(output_dir, f"{stem}.pt")
         torch.save(vision_features.cpu(), save_path)
         # print(f"  -> {idx+1}/50 salvate (ultima: {os.path.basename(save_path)})")
         if (idx + 1) % 500 == 0 or idx == len(image_paths) - 1:
