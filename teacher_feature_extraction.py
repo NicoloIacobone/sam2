@@ -34,17 +34,19 @@ sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_larg
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
 # Percorso singola immagine
-image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg"
+# image_path = "/cluster/work/igp_psr/niacobone/examples/photos/small_img/000.jpeg"
 
-dir_names = ["yokohama", "tenda_ufficio", "sedia_ufficio", "pianta", "car_drift"]
-base_path = "/cluster/work/igp_psr/niacobone"
-output_dir = "/cluster/scratch/niacobone/distillation/sam2/coco2017"
-COCO2017_PATH = "/cluster/work/igp_psr/niacobone/coco2017"
+# dir_names = ["yokohama", "tenda_ufficio", "sedia_ufficio", "pianta", "car_drift"]
+# base_path = "/cluster/work/igp_psr/niacobone"
+# frames_globs = ["*.jpg", "*.png", "*.png", "*.png", "*.png"]
 # frames_glob deve essere una lista, appaiata con dir_names
-frames_globs = ["*.jpg", "*.png", "*.png", "*.png", "*.png"]
-
 # Directory con più frame (imposta se multiple_frames=True)
 multiple_frames = False
+
+# output_dir = "/cluster/scratch/niacobone/distillation/sam2/coco2017"
+# COCO2017_PATH = "/cluster/work/igp_psr/niacobone/coco2017"
+output_dir = "/cluster/scratch/niacobone/distillation/dataset/coco2017/train2017"
+COCO2017_PATH = "/cluster/work/igp_psr/data/cocostuff/dataset/images/train2017"
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 sam2.eval()
@@ -70,7 +72,7 @@ for idx, img_path in enumerate(image_paths):
         save_path = os.path.join(output_dir, f"{stem}.pt")
         torch.save(vision_features.cpu(), save_path)
         # print(f"  -> {idx+1}/50 salvate (ultima: {os.path.basename(save_path)})")
-        if (idx + 1) % 50 == 0 or idx == len(image_paths) - 1:
+        if (idx + 1) % 500 == 0 or idx == len(image_paths) - 1:
             print(f"  -> {idx+1}/{len(image_paths)} salvate (ultima: {os.path.basename(save_path)})")
     except Exception as e:
         print(f"[ERRORE] Immagine {img_path} saltata: {e}")
