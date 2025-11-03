@@ -45,8 +45,8 @@ multiple_frames = False
 
 # output_dir = "/cluster/scratch/niacobone/distillation/sam2/coco2017"
 # COCO2017_PATH = "/cluster/work/igp_psr/niacobone/coco2017"
-output_dir = "/cluster/scratch/niacobone/distillation/dataset/coco2017/train2017"
-COCO2017_PATH = "/cluster/work/igp_psr/data/cocostuff/dataset/images/train2017"
+output_dir = "/cluster/scratch/niacobone/distillation/dataset/coco2017/val2017"
+COCO2017_PATH = "/cluster/work/igp_psr/data/cocostuff/dataset/images/val2017"
 
 sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
 sam2.eval()
