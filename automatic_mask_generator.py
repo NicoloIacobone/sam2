@@ -82,8 +82,8 @@ for frame in frames:
     torch.cuda.empty_cache()
 
 # Save the masks object as a numpy file
-arr = np.array(masks, dtype=object)
-np.save(os.path.join(output_path, "masks.npy"), arr)
+# arr = np.array(masks, dtype=object)
+np.save(os.path.join(output_path, "masks.npy"), masks)
 print(f"Masks saved to {os.path.join(output_path, 'masks.npy')}")
 
 # plt.figure(figsize=(20, 20))
