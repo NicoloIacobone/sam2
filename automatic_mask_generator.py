@@ -49,13 +49,14 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "original"
+dir_name = "test_multi_view_single_inference"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
 
 input_path = os.path.join(base_path, "examples/photos", dir_name)
-output_path = os.path.join(base_path, "automatic_mask_generator", dir_name)
+# output_path = os.path.join(base_path, "automatic_mask_generator", dir_name)
+output_path = input_path
 os.makedirs(output_path, exist_ok=True)
 frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
 frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
@@ -63,17 +64,22 @@ frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
 sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_large.pt"
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 # model_cfg = "configs/sam2.1/sam2.1_hiera_l_nico.yaml" # I set use_high_res_features_in_sam: false
+masks = []
 
-sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
-# disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
-sam2.sam_mask_decoder.use_high_res_features = False
-sam2.use_high_res_features_in_sam = False
-sam2.num_feature_levels = 1
+for frame in frames:
+    sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+    # disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
+    sam2.sam_mask_decoder.use_high_res_features = False
+    sam2.use_high_res_features_in_sam = False
+    sam2.num_feature_levels = 1
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2)
-# per questo test considero solo la prima immagine
-image = frames[0]
-masks = mask_generator.generate(image)
+    mask_generator = SAM2AutomaticMaskGenerator(sam2)
+    # per questo test considero solo la prima immagine
+    mask = mask_generator.generate(frame)
+    masks.append(mask)
+
+    del sam2
+    torch.cuda.empty_cache()
 
 # Save the masks object as a numpy file
 np.save(os.path.join(output_path, "masks.npy"), masks)
