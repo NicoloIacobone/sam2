@@ -72,12 +72,12 @@ sam2.num_feature_levels = 1
 
 mask_generator = SAM2AutomaticMaskGenerator(sam2)
 # per questo test considero solo la prima immagine
-image = frames[2]
+image = frames[3]
 masks = mask_generator.generate(image)
 
 # Save the masks object as a numpy file
-np.save(os.path.join(output_path, "00002.npy"), masks)
-print(f"Masks saved to {os.path.join(output_path, '00002.npy')}")
+np.save(os.path.join(output_path, "00003.npy"), masks)
+print(f"Masks saved to {os.path.join(output_path, '00003.npy')}")
 
 # plt.figure(figsize=(20, 20))
 # plt.imshow(image)
