@@ -78,7 +78,7 @@ for frame in frames:
     mask = mask_generator.generate(frame)
     masks.append(mask)
 
-    del sam2
+    del sam2, mask_generator
     torch.cuda.empty_cache()
 
 # Save the masks object as a numpy file
