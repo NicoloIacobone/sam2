@@ -42,7 +42,7 @@ echo "Activated Python venv: $(which python)"
 cd /cluster/scratch/niacobone/sam2
 echo "Starting sam2 save mask job..."
 
-python automatic_mask_generator.py
+python automatic_mask_generator_backup.py
 
 echo "=== Job finished at $(date) ==="
 start_time=${SLURM_JOB_START_TIME:-$(date +%s)}
