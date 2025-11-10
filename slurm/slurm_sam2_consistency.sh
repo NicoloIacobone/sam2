@@ -13,7 +13,7 @@
 #SBATCH --open-mode=append
 #
 # Specify time limit.
-#SBATCH --time=00:30:00
+#SBATCH --time=00:10:00
 #
 # Specify number of tasks.
 #SBATCH --ntasks=1
@@ -22,7 +22,7 @@
 #SBATCH --cpus-per-task=1
 #
 # Specify memory limit per CPU core.
-#SBATCH --mem-per-cpu=8192
+#SBATCH --mem-per-cpu=4096
 #
 # Specify number of required GPUs.
 #SBATCH --gpus=rtx_4090:1
