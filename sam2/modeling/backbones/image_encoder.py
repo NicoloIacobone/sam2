@@ -45,7 +45,7 @@ class ImageEncoder(nn.Module):
         # debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/original/student_embeddings_epoch3000.pt"  # Modifica questo path per il debug
         # debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/original/student_embeddings_epoch5000.pt"  # Modifica questo path per il debug
         # debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/mapanything/original/student_embeddings_run_1.pt"  # Modifica questo path per il debug
-        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_1/visualizations/student/8.pt"  # Modifica questo path per il debug
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_2/visualizations/student/9.pt"  # Modifica questo path per il debug
         if consistency_test:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 

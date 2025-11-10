@@ -86,14 +86,14 @@ for frame in frames:
 np.save(os.path.join(output_path, "masks.npy"), masks)
 print(f"Masks saved to {os.path.join(output_path, 'masks.npy')}")
 
-# plt.figure(figsize=(20, 20))
-# plt.imshow(image)
-# show_anns(masks)
-# plt.axis('off')
-# output_file = os.path.join(output_path, "masks_consistency_coco.png")
-# plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
-# plt.close()
-# print(f"Saved to {output_file}")
+plt.figure(figsize=(20, 20))
+plt.imshow(frames[0])
+show_anns(masks)
+plt.axis('off')
+output_file = os.path.join(output_path, "masks_consistency_coco.png")
+plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+plt.close()
+print(f"Saved to {output_file}")
 
 # # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
 # mask_generator = SAM2AutomaticMaskGenerator(
