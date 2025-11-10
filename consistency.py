@@ -51,13 +51,14 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "original"
+dir_name = "distillation_2"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
 
 input_path = os.path.join(base_path, "examples/photos", dir_name)
-output_path = os.path.join(base_path, "consistency_test", dir_name)
+# output_path = os.path.join(base_path, "consistency_test", dir_name)
+output_path = os.path.join(input_path, "consistency_test")
 os.makedirs(output_path, exist_ok=True)
 frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
 frames = [np.array(Image.open(p).convert("RGB")) for p in frame_paths]
@@ -93,7 +94,7 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks)
 plt.axis('off')
-output_file = os.path.join(output_path, "run_5_teacher.png")
+output_file = os.path.join(output_path, "consistency.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
