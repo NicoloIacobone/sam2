@@ -77,7 +77,7 @@ sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2)
+mask_generator = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.0, stability_score_thresh=0.0)
 
 # mask_generator = SAM2AutomaticMaskGenerator(
 #     sam2,
