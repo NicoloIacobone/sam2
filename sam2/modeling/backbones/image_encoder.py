@@ -10,6 +10,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from nico.utils import create_student_original_teacher_side_by_side
+
 class ImageEncoder(nn.Module):
     def __init__(
         self,
@@ -48,6 +50,9 @@ class ImageEncoder(nn.Module):
             # Controlla la shape di output["vision_features"]
             vision_features_shape = output["vision_features"].shape
             loaded_feature = loaded[0]
+
+            create_student_original_teacher_side_by_side(loaded_feature, output["vision_features"], "/cluster/work/igp_psr/niacobone/examples/photos/distillation_2/000000003661.jpg", 19, "/cluster/work/igp_psr/niacobone/examples/photos/distillation_2/consistency_test")
+
             if len(vision_features_shape) == 3:
                 # B x H x W
                 output["vision_features"] = loaded_feature
