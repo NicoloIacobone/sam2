@@ -59,7 +59,7 @@ frames_glob = "*.jpg"
 input_path = os.path.join(base_path, "examples/photos", dir_name)
 print(f"Input path: {input_path}")
 # output_path = os.path.join(base_path, "consistency_test", dir_name)
-output_path = os.path.join(input_path, "consistency_test")
+output_path = os.path.join(input_path, "distillation_3")
 os.makedirs(output_path, exist_ok=True)
 frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
 print("Found frames:")
@@ -77,28 +77,27 @@ sam2.sam_mask_decoder.use_high_res_features = False
 sam2.use_high_res_features_in_sam = False
 sam2.num_feature_levels = 1
 
-mask_generator = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.0, stability_score_thresh=0.0)
+mask_generator_1 = SAM2AutomaticMaskGenerator(sam2)
+mask_generator_2 = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.0, stability_score_thresh=0.0)
 
-# mask_generator = SAM2AutomaticMaskGenerator(
-#     sam2,
-#     points_per_side=8,          # ridotto (64 punti)
-#     multimask_output=False,     # 1 maschera per punto
-#     pred_iou_thresh=0.0,
-#     stability_score_thresh=0.0,
-#     mask_threshold=-5.0,
-#     min_mask_region_area=0,
-#     box_nms_thresh=1.0,
-#     crop_n_layers=0,
-# )
-# per questo test considero solo la prima immagine
 image = frames[0]
-masks = mask_generator.generate(image)
+masks_1 = mask_generator_1.generate(image)
+masks_2 = mask_generator_2.generate(image)
 
 plt.figure(figsize=(20, 20))
 plt.imshow(image)
-show_anns(masks)
+show_anns(masks_1)
 plt.axis('off')
-output_file = os.path.join(output_path, "consistency_epoch_19_student.png")
+output_file = os.path.join(output_path, "student_normal.png")
+plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+plt.close()
+print(f"Saved to {output_file}")
+
+plt.figure(figsize=(20, 20))
+plt.imshow(image)
+show_anns(masks_2)
+plt.axis('off')
+output_file = os.path.join(output_path, "student_no_threshold.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
