@@ -368,6 +368,7 @@ def create_student_original_teacher_side_by_side(
 
     # --- Step 5: salva il risultato ---
     combined_path = os.path.join(output_heatmaps, f"{epoch}.png")
+    os.makedirs(output_heatmaps, exist_ok=True)
     combined_img.save(combined_path)
 
     # --- Step 6: salva gli embeddings se richiesto ---
