@@ -51,7 +51,7 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "distillation_2"
+dir_name = "distillation_3"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
@@ -79,16 +79,22 @@ sam2.num_feature_levels = 1
 
 mask_generator_1 = SAM2AutomaticMaskGenerator(sam2)
 mask_generator_2 = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.0, stability_score_thresh=0.0)
+mask_generator_3 = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.4, stability_score_thresh=0.5)
+mask_generator_4 = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.4, stability_score_thresh=0.5, mask_threshold=0.2)
+mask_generator_5 = SAM2AutomaticMaskGenerator(sam2, pred_iou_thresh=0.4, stability_score_thresh=0.5, mask_threshold=-0.2)
 
 image = frames[0]
 masks_1 = mask_generator_1.generate(image)
 masks_2 = mask_generator_2.generate(image)
+masks_3 = mask_generator_3.generate(image)
+masks_4 = mask_generator_4.generate(image)
+masks_5 = mask_generator_5.generate(image)
 
 plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_1)
 plt.axis('off')
-output_file = os.path.join(output_path, "student_normal_11.png")
+output_file = os.path.join(output_path, "student_normal_24.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
@@ -97,10 +103,36 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_2)
 plt.axis('off')
-output_file = os.path.join(output_path, "student_no_threshold_23.png")
+output_file = os.path.join(output_path, "student_no_threshold_24.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
+
+plt.figure(figsize=(20, 20))
+plt.imshow(image)
+show_anns(masks_3)
+plt.axis('off')
+output_file = os.path.join(output_path, "student_medium_threshold_24.png")
+plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+plt.close()
+print(f"Saved to {output_file}")
+
+plt.figure(figsize=(20, 20))
+plt.imshow(image)
+show_anns(masks_4)
+plt.axis('off')
+output_file = os.path.join(output_path, "student_medium_threshold_24_mask_threshold_02.png")
+plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+plt.close()
+print(f"Saved to {output_file}")
+
+plt.figure(figsize=(20, 20))
+plt.imshow(image)
+show_anns(masks_5)
+plt.axis('off')
+output_file = os.path.join(output_path, "student_medium_threshold_24_mask_threshold_neg_02.png")
+plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
+plt.close()
 
 # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
 # sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
