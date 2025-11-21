@@ -52,7 +52,7 @@ if device.type == "cuda":
         torch.backends.cudnn.allow_tf32 = True
 
 dir_name = "distillation_4"
-img_name = "000000000025"
+img_name = "000000000030"
 base_path = "/cluster/work/igp_psr/niacobone"
 student = True
 # frames_glob deve essere una lista, appaiata con dir_names
