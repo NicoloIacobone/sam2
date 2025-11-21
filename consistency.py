@@ -52,7 +52,7 @@ if device.type == "cuda":
         torch.backends.cudnn.allow_tf32 = True
 
 dir_name = "distillation_4"
-img_name = "000000000009"
+img_name = "000000000025"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
@@ -139,6 +139,7 @@ plt.axis('off')
 output_file = os.path.join(output_path, "teacher_medium_threshold_mask_threshold_neg_02.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
+print(f"Saved to {output_file}")
 
 # DEBUG - test rimozione filtri e abbassamento threshold per provare a vedere qualche segmentation mask con embedding additional head
 # sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
