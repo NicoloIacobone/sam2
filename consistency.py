@@ -54,6 +54,7 @@ if device.type == "cuda":
 dir_name = "distillation_4"
 img_name = "000000000025"
 base_path = "/cluster/work/igp_psr/niacobone"
+student = True
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
 
@@ -95,8 +96,10 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_1)
 plt.axis('off')
-# output_file = os.path.join(output_path, "student_normal.png")
-output_file = os.path.join(output_path, "teacher_normal.png")
+if student:
+    output_file = os.path.join(output_path, "student_normal.png")
+else:
+    output_file = os.path.join(output_path, "teacher_normal.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
@@ -105,8 +108,10 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_2)
 plt.axis('off')
-# output_file = os.path.join(output_path, "student_no_threshold.png")
-output_file = os.path.join(output_path, "teacher_no_threshold.png")
+if student:
+    output_file = os.path.join(output_path, "student_no_threshold.png")
+else:
+    output_file = os.path.join(output_path, "teacher_no_threshold.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
@@ -115,8 +120,10 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_3)
 plt.axis('off')
-# output_file = os.path.join(output_path, "student_medium_threshold.png")
-output_file = os.path.join(output_path, "teacher_medium_threshold.png")
+if student:
+    output_file = os.path.join(output_path, "student_medium_threshold.png")
+else:
+    output_file = os.path.join(output_path, "teacher_medium_threshold.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
@@ -125,8 +132,10 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_4)
 plt.axis('off')
-# output_file = os.path.join(output_path, "student_medium_threshold_mask_threshold_02.png")
-output_file = os.path.join(output_path, "teacher_medium_threshold_mask_threshold_02.png")
+if student:
+    output_file = os.path.join(output_path, "student_medium_threshold_mask_threshold_02.png")
+else:
+    output_file = os.path.join(output_path, "teacher_medium_threshold_mask_threshold_02.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
@@ -135,8 +144,10 @@ plt.figure(figsize=(20, 20))
 plt.imshow(image)
 show_anns(masks_5)
 plt.axis('off')
-# output_file = os.path.join(output_path, "student_medium_threshold_mask_threshold_neg_02.png")
-output_file = os.path.join(output_path, "teacher_medium_threshold_mask_threshold_neg_02.png")
+if student:
+    output_file = os.path.join(output_path, "student_medium_threshold_mask_threshold_neg_02.png")
+else:
+    output_file = os.path.join(output_path, "teacher_medium_threshold_mask_threshold_neg_02.png")
 plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
 plt.close()
 print(f"Saved to {output_file}")
