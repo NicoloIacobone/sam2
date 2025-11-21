@@ -43,7 +43,7 @@ class ImageEncoder(nn.Module):
 
         # DEBUG: CONSISTENCY TEST
         consistency_test = False
-        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_3/visualizations/student/24.pt"  # Modifica questo path per il debug
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/tests/embeddings/student/000000000030.pt"  # Modifica questo path per il debug
         if consistency_test:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 
@@ -51,7 +51,7 @@ class ImageEncoder(nn.Module):
             vision_features_shape = output["vision_features"].shape
             loaded_feature = loaded[0]
 
-            create_student_original_teacher_side_by_side(loaded_feature, output["vision_features"], "/cluster/work/igp_psr/niacobone/examples/photos/distillation_2/000000003661.jpg", 24, "/cluster/work/igp_psr/niacobone/examples/photos/distillation_3/consistency_test")
+            create_student_original_teacher_side_by_side(loaded_feature, output["vision_features"], "/cluster/work/igp_psr/niacobone/examples/photos/distillation_4/000000000030.jpg", 0, "/cluster/work/igp_psr/niacobone/examples/photos/distillation_4/consistency_test")
 
             if len(vision_features_shape) == 3:
                 # B x H x W
