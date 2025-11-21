@@ -52,6 +52,7 @@ if device.type == "cuda":
         torch.backends.cudnn.allow_tf32 = True
 
 dir_name = "distillation_4"
+img_name = "000000000009"
 base_path = "/cluster/work/igp_psr/niacobone"
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
@@ -59,7 +60,7 @@ frames_glob = "*.jpg"
 input_path = os.path.join(base_path, "examples/photos", dir_name)
 print(f"Input path: {input_path}")
 # output_path = os.path.join(base_path, "consistency_test", dir_name)
-output_path = os.path.join(input_path, dir_name)
+output_path = os.path.join(input_path, img_name)
 os.makedirs(output_path, exist_ok=True)
 frame_paths = sorted(glob.glob(os.path.join(input_path, frames_glob)))
 print("Found frames:")
