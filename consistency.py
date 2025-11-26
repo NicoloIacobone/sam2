@@ -54,7 +54,7 @@ if device.type == "cuda":
 dir_name = "overfit_single_image_test_2"
 img_name = "000000000009"
 base_path = "/cluster/work/igp_psr/niacobone"
-student = True
+student = False
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
 
