@@ -42,9 +42,9 @@ class ImageEncoder(nn.Module):
         }
 
         # DEBUG: CONSISTENCY TEST
-        student = False
+        student = True
         # debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/tests/embeddings/student/000000002587.pt"  # Modifica questo path per il debug
-        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_4/visualizations/student/000000002587.pt"  # Modifica questo path per il debug
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_6_freeze_4/visualizations/student/000000002149.pt"  # Modifica questo path per il debug
         if student:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 
@@ -52,7 +52,7 @@ class ImageEncoder(nn.Module):
             vision_features_shape = output["vision_features"].shape
             loaded_feature = loaded[0]
 
-            create_student_original_teacher_side_by_side(loaded_feature, output["vision_features"], "/cluster/work/igp_psr/niacobone/examples/photos/distillation_4/000000002587.jpg", 8, "/cluster/work/igp_psr/niacobone/examples/photos/distillation_4/000000002587")
+            create_student_original_teacher_side_by_side(loaded_feature, output["vision_features"], "/cluster/work/igp_psr/niacobone/examples/photos/distillation_6_freeze_4/000000002149.jpg", 6, "/cluster/work/igp_psr/niacobone/examples/photos/distillation_6_freeze_4/000000002149")
 
             if len(vision_features_shape) == 3:
                 # B x H x W
