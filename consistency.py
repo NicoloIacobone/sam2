@@ -51,8 +51,8 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "overfit_single_image_test_2"
-img_name = "000000000009"
+dir_name = "overfit_single_image_test_3"
+img_name = "000000544826"
 base_path = "/cluster/work/igp_psr/niacobone"
 student = False
 # frames_glob deve essere una lista, appaiata con dir_names
