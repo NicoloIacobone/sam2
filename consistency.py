@@ -51,7 +51,7 @@ if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
 
-dir_name = "distillation_7_deeper_dpt"
+dir_name = "distillation_6_freeze_4"
 img_name = "000000002149"
 base_path = "/cluster/work/igp_psr/niacobone"
 student = True

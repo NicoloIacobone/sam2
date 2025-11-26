@@ -44,7 +44,7 @@ class ImageEncoder(nn.Module):
         # DEBUG: CONSISTENCY TEST
         student = True
         # debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/tests/embeddings/student/000000002587.pt"  # Modifica questo path per il debug
-        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_7_deeper_dpt/visualizations/student/10.pt"  # Modifica questo path per il debug
+        debug_vision_features_path = "/cluster/work/igp_psr/niacobone/distillation/output/distillation_6_freeze_4/visualizations/student/7.pt"  # Modifica questo path per il debug
         if student:
             loaded = torch.load(debug_vision_features_path, map_location=src.device, weights_only=True)
 
