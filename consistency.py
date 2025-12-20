@@ -54,7 +54,7 @@ if device.type == "cuda":
 dir_name = "SV_11_ALL_UNFROZEN"
 img_name = "000000000724"
 base_path = "/cluster/work/igp_psr/niacobone"
-student = False
+student = True
 # frames_glob deve essere una lista, appaiata con dir_names
 frames_glob = "*.jpg"
 
