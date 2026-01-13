@@ -68,6 +68,18 @@ masks = []
 
 for frame in frames:
     sam2 = build_sam2(model_cfg, sam2_checkpoint, device=device, apply_postprocessing=False)
+
+    # DEBUG NICO
+    from training.trainer import get_human_readable_count
+
+    mask_decoder = sam2.sam_mask_decoder
+    total_params = sum(p.numel() for p in mask_decoder.parameters())
+    trainable_params = sum(p.numel() for p in mask_decoder.parameters() if p.requires_grad)
+
+    print(f"Total parameters: {get_human_readable_count(total_params)}")
+    print(f"Trainable parameters: {get_human_readable_count(trainable_params)}")
+    # ===============================================================
+
     # disabilito l'uso runtime (i layer restano caricati ma non vengono chiamati)
     sam2.sam_mask_decoder.use_high_res_features = False
     sam2.use_high_res_features_in_sam = False
