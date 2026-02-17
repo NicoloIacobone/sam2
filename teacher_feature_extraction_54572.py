@@ -115,11 +115,12 @@ sam2_checkpoint = "/cluster/scratch/niacobone/sam2/checkpoints/sam2.1_hiera_larg
 model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
 
 output_dir = "/cluster/scratch/niacobone/distillation/dataset/thank_you/images/train"
-COCO2017_PATH = "/cluster/scratch/niacobone/distillation/dataset/thank_you/images/train"
+dir_path = "/cluster/scratch/niacobone/distillation/dataset/thank_you/images/train"
 
 # File specifico da rigenerare
 target_file = "Thank_You.jpg"
-img_path = os.path.join(COCO2017_PATH, target_file)
+img_path = os.path.join(dir_path, target_file)
+print(f"[INFO] Target file: {img_path}")
 save_path = os.path.join(output_dir, "Thank_You.pt")
 
 if not os.path.exists(img_path):
