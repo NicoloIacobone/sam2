@@ -118,7 +118,7 @@ output_dir = "/cluster/scratch/niacobone/distillation/dataset/thank_you/images/t
 dir_path = "/cluster/scratch/niacobone/distillation/dataset/thank_you/images/train"
 
 # File specifico da rigenerare
-target_file = "Thank_You.jpg"
+target_file = "IMG_7926.jpg"
 img_path = os.path.join(dir_path, target_file)
 print(f"[INFO] Target file: {img_path}")
 save_path = os.path.join(output_dir, "Thank_You.pt")
